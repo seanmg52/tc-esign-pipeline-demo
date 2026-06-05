@@ -19,6 +19,26 @@ export type CustomerResponse =
   | "wet-ink";
 
 export type GateStatus = "clear" | "flagged";
+export type FindingSeverity = "review" | "blocker";
+export type GateName =
+  | "Gate A - Entity / PPSR"
+  | "Gate B - Signer Authority"
+  | "Gate C - T&C Package";
+export type FindingCode =
+  | "NZBN_MISSING"
+  | "PPSR_REGISTRATION_MISSING"
+  | "ENTITY_NOT_ACTIVE"
+  | "PPSR_DEBTOR_MISMATCH"
+  | "SIGNER_MISSING"
+  | "SIGNER_ROLE_MISSING"
+  | "AUTHORITY_EVIDENCE_MISSING"
+  | "DELIVERY_EMAIL_INVALID"
+  | "DELIVERY_EMAIL_UNVERIFIED"
+  | "AUTHORITY_WEAK_FOR_MATERIAL_ACCOUNT"
+  | "TC_TEMPLATE_MISSING"
+  | "COLLATERAL_CLAUSE_NOT_APPROVED"
+  | "COVERAGE_NEEDS_COUNSEL_REVIEW"
+  | "ESIGN_INELIGIBLE";
 export type Disposition =
   | "signed-evidenced"
   | "human-review"
@@ -28,29 +48,37 @@ export type Disposition =
   | "wet-ink-or-counsel";
 
 export interface ReadinessRecord {
-  id: string;
+  customerId: string;
   tradingName: string;
-  legalEntity: string;
+  legalName: string;
   nzbn: string;
-  entityStatus: EntityStatus;
-  ppsrDebtorMatches: boolean;
+  ppsrRegistrationNumber: string;
   exposureBand: ExposureBand;
-  proposedSignatory: string;
-  signatoryRole: string;
+  signerName: string;
+  signerRole: string;
+  signerEmail: string;
   authorityEvidence: AuthorityEvidence;
-  deliveryEmail: string;
-  emailConfidence: EmailConfidence;
   templateVersion: string;
-  collateralClauseApproved: boolean;
   coverage: Coverage;
   eSignEligible: boolean;
-  customerResponse: CustomerResponse;
+  entityStatus?: EntityStatus;
+  ppsrDebtorMatches?: boolean;
+  emailConfidence?: EmailConfidence;
+  collateralClauseApproved?: boolean;
+  customerResponse?: CustomerResponse;
+}
+
+export interface Finding {
+  severity: FindingSeverity;
+  code: FindingCode;
+  message: string;
+  recommendedNextAction: string;
 }
 
 export interface GateFinding {
-  name: "Debtor / PPSR" | "Authority / Delivery" | "Agreement / E-sign";
+  name: GateName;
   status: GateStatus;
-  findings: string[];
+  findings: Finding[];
 }
 
 export interface EvaluatedRecord extends ReadinessRecord {
@@ -95,41 +123,139 @@ export function evaluateRecord(record: ReadinessRecord): EvaluatedRecord {
 }
 
 function evaluateDebtorGate(record: ReadinessRecord): GateFinding {
-  const findings: string[] = [];
+  const findings: Finding[] = [];
 
-  if (!record.nzbn.trim()) findings.push("NZBN / registry identifier is missing");
-  if (record.entityStatus !== "active") findings.push("Legal entity is not confirmed active");
-  if (!record.ppsrDebtorMatches) findings.push("PPSR debtor does not match verified legal entity");
+  if (!record.nzbn.trim()) {
+    findings.push({
+      severity: "blocker",
+      code: "NZBN_MISSING",
+      message: "NZBN / registry identifier is missing.",
+      recommendedNextAction: "Confirm the customer legal entity before sending standard T&Cs."
+    });
+  }
+  if (!record.ppsrRegistrationNumber.trim()) {
+    findings.push({
+      severity: "review",
+      code: "PPSR_REGISTRATION_MISSING",
+      message: "PPSR registration number is missing.",
+      recommendedNextAction: "Locate or create the PPSR reference before closing the evidence packet."
+    });
+  }
+  if ((record.entityStatus ?? "active") !== "active") {
+    findings.push({
+      severity: "blocker",
+      code: "ENTITY_NOT_ACTIVE",
+      message: "Legal entity is not confirmed active.",
+      recommendedNextAction: "Resolve the entity status before sending standard T&Cs."
+    });
+  }
+  if (record.ppsrDebtorMatches === false) {
+    findings.push({
+      severity: "blocker",
+      code: "PPSR_DEBTOR_MISMATCH",
+      message: "PPSR debtor does not match the verified legal entity.",
+      recommendedNextAction: "Verify the debtor record before sending standard T&Cs."
+    });
+  }
 
-  return gate("Debtor / PPSR", findings);
+  return gate("Gate A - Entity / PPSR", findings);
 }
 
 function evaluateAuthorityGate(record: ReadinessRecord): GateFinding {
-  const findings: string[] = [];
+  const findings: Finding[] = [];
 
-  if (!record.proposedSignatory.trim()) findings.push("No proposed signatory recorded");
-  if (record.authorityEvidence === "none") findings.push("No authority evidence recorded for proposed signer");
-  if (!record.deliveryEmail.includes("@")) findings.push("Delivery email is invalid");
-  if (record.emailConfidence !== "verified") findings.push("Delivery email is not verified");
+  if (!record.signerName.trim()) {
+    findings.push({
+      severity: "blocker",
+      code: "SIGNER_MISSING",
+      message: "No proposed signatory recorded.",
+      recommendedNextAction: "Identify a proposed signer before preparing the envelope."
+    });
+  }
+  if (!record.signerRole.trim()) {
+    findings.push({
+      severity: "review",
+      code: "SIGNER_ROLE_MISSING",
+      message: "No signer role recorded.",
+      recommendedNextAction: "Record the signer's role so authority can be assessed."
+    });
+  }
+  if (record.authorityEvidence === "none") {
+    findings.push({
+      severity: "blocker",
+      code: "AUTHORITY_EVIDENCE_MISSING",
+      message: "No authority evidence recorded for proposed signer.",
+      recommendedNextAction: "Collect role or authority evidence before sending standard T&Cs."
+    });
+  }
+  if (!record.signerEmail.includes("@")) {
+    findings.push({
+      severity: "blocker",
+      code: "DELIVERY_EMAIL_INVALID",
+      message: "Delivery email is invalid.",
+      recommendedNextAction: "Correct the delivery email before preparing the envelope."
+    });
+  }
+  if ((record.emailConfidence ?? "verified") !== "verified") {
+    findings.push({
+      severity: "review",
+      code: "DELIVERY_EMAIL_UNVERIFIED",
+      message: "Delivery email is not verified.",
+      recommendedNextAction: "Confirm the delivery address before sending the envelope."
+    });
+  }
   if (record.exposureBand !== "low" && record.authorityEvidence === "account-owner-confirmed") {
-    findings.push("Material accounts need stronger authority evidence than account-owner confirmation");
+    findings.push({
+      severity: "review",
+      code: "AUTHORITY_WEAK_FOR_MATERIAL_ACCOUNT",
+      message: "Material accounts need stronger authority evidence than account-owner confirmation.",
+      recommendedNextAction: "Collect director, delegated authority, customer certificate, or legal-approved evidence."
+    });
   }
 
-  return gate("Authority / Delivery", findings);
+  return gate("Gate B - Signer Authority", findings);
 }
 
 function evaluateAgreementGate(record: ReadinessRecord): GateFinding {
-  const findings: string[] = [];
+  const findings: Finding[] = [];
 
-  if (!record.templateVersion.trim()) findings.push("T&C template version is missing");
-  if (!record.collateralClauseApproved) findings.push("Collateral / security clause is not approved");
-  if (record.coverage === "counsel-review") findings.push("Coverage of existing / future credit needs counsel review");
-  if (!record.eSignEligible) findings.push("Record is not eligible for the e-sign path");
+  if (!record.templateVersion.trim()) {
+    findings.push({
+      severity: "blocker",
+      code: "TC_TEMPLATE_MISSING",
+      message: "T&C template version is missing.",
+      recommendedNextAction: "Select the approved T&C template before preparing the envelope."
+    });
+  }
+  if (record.collateralClauseApproved === false) {
+    findings.push({
+      severity: "review",
+      code: "COLLATERAL_CLAUSE_NOT_APPROVED",
+      message: "Collateral / security clause is not approved.",
+      recommendedNextAction: "Confirm the security clause position before sending standard T&Cs."
+    });
+  }
+  if (record.coverage === "counsel-review") {
+    findings.push({
+      severity: "review",
+      code: "COVERAGE_NEEDS_COUNSEL_REVIEW",
+      message: "Coverage of existing / future credit needs counsel review.",
+      recommendedNextAction: "Route the coverage question for human review before sending."
+    });
+  }
+  if (!record.eSignEligible) {
+    findings.push({
+      severity: "blocker",
+      code: "ESIGN_INELIGIBLE",
+      message: "Record is not eligible for the e-sign path.",
+      recommendedNextAction: "Route to wet-ink signature or counsel review before proceeding."
+    });
+  }
 
-  return gate("Agreement / E-sign", findings);
+  return gate("Gate C - T&C Package", findings);
 }
 
-function gate(name: GateFinding["name"], findings: string[]): GateFinding {
+function gate(name: GateName, findings: Finding[]): GateFinding {
   return {
     name,
     findings,
@@ -140,10 +266,12 @@ function gate(name: GateFinding["name"], findings: string[]): GateFinding {
 function chooseDisposition(record: ReadinessRecord, hasGateFlag: boolean): Disposition {
   if (hasGateFlag) return record.eSignEligible ? "human-review" : "wet-ink-or-counsel";
 
-  if (record.customerResponse === "signed") return "signed-evidenced";
-  if (record.customerResponse === "negotiating") return "negotiation";
-  if (record.customerResponse === "refused") return "credit-stop-review";
-  if (record.customerResponse === "wet-ink") return "wet-ink-or-counsel";
+  const customerResponse = record.customerResponse ?? "not-sent";
+
+  if (customerResponse === "signed") return "signed-evidenced";
+  if (customerResponse === "negotiating") return "negotiation";
+  if (customerResponse === "refused") return "credit-stop-review";
+  if (customerResponse === "wet-ink") return "wet-ink-or-counsel";
 
   return "in-chase";
 }

@@ -94,6 +94,30 @@ h3 {
   text-decoration: none;
 }
 
+button,
+.uploadButton {
+  border: 2px solid #182132;
+  border-radius: 16px;
+  padding: 12px 14px;
+  background: #172033;
+  color: #ffffff;
+  box-shadow: 3px 3px 0 #c9b88f;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+
+button.secondaryButton {
+  background: #fffaf0;
+  color: #172033;
+}
+
+code {
+  color: #172033;
+  font-size: 0.86em;
+  overflow-wrap: anywhere;
+}
+
 .panel,
 .summaryCard {
   border: 2px solid rgba(24, 33, 50, 0.12);
@@ -105,6 +129,96 @@ h3 {
 .panel {
   margin-top: 28px;
   padding: 28px;
+}
+
+.dataPanel {
+  display: grid;
+  gap: 18px;
+}
+
+.sourceStatus {
+  width: fit-content;
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #0f766e;
+  font-weight: 900;
+}
+
+.inputGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(240px, 0.65fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.csvBox {
+  display: grid;
+  gap: 8px;
+}
+
+.csvBox span {
+  color: #75664d;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+textarea {
+  min-height: 210px;
+  width: 100%;
+  border: 2px solid rgba(24, 33, 50, 0.16);
+  border-radius: 20px;
+  padding: 14px;
+  background: #ffffff;
+  color: #172033;
+  font: 0.9rem ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  line-height: 1.45;
+  resize: vertical;
+}
+
+.sourceControls {
+  display: grid;
+  gap: 12px;
+}
+
+.sourceControls p {
+  margin-bottom: 0;
+  font-size: 0.92rem;
+}
+
+.uploadButton {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+
+.uploadButton input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.validationBox {
+  border: 2px solid rgba(249, 115, 22, 0.28);
+  border-radius: 20px;
+  padding: 16px 18px;
+  background: #fff7ed;
+}
+
+.validationBox h3 {
+  margin-bottom: 10px;
+}
+
+.validationBox ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
 }
 
 .diagramPanel {
@@ -378,6 +492,46 @@ h3 {
   background: #ffffff;
 }
 
+.artifactGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.artifactCard {
+  border: 2px solid rgba(24, 33, 50, 0.1);
+  border-radius: 20px;
+  padding: 18px;
+  background: #ffffff;
+}
+
+.artifactCard h3 {
+  margin-bottom: 8px;
+}
+
+.artifactCard a,
+.downloadList a {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 9px 12px;
+  background: #e6edff;
+  color: #172033;
+  font-size: 0.86rem;
+  font-weight: 900;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.downloadList {
+  display: grid;
+  gap: 8px;
+}
+
+.downloadList span {
+  color: #64748b;
+  font-weight: 750;
+}
+
 .recordTopline {
   display: flex;
   gap: 16px;
@@ -491,6 +645,7 @@ dd {
 
 @media (max-width: 980px) {
   .diagramPanel,
+  .inputGrid,
   .recordGrid {
     grid-template-columns: 1fr;
   }
@@ -529,6 +684,10 @@ dd {
   .summaryGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .artifactGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -542,6 +701,7 @@ dd {
   }
 
   .summaryGrid,
+  .artifactGrid,
   dl {
     grid-template-columns: 1fr;
   }

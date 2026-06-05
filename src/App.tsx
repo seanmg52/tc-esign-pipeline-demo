@@ -1,8 +1,9 @@
-import { evaluateCampaign, type Disposition, type EvaluatedRecord } from "./pipeline";
+import { useMemo, useState, type ChangeEvent } from "react";
+import { generateCampaignArtifacts } from "./artifacts";
+import { parseReadinessCsv, READINESS_CSV_COLUMNS, type CsvValidationError } from "./importCsv";
+import { evaluateCampaign, type Disposition, type EvaluatedRecord, type ReadinessRecord } from "./pipeline";
 import { sampleRecords } from "./sampleRecords";
 import "./styles.css";
-
-const evaluation = evaluateCampaign(sampleRecords);
 
 const dispositionLabels: Record<Disposition, string> = {
   "signed-evidenced": "Signed + evidenced",
@@ -22,21 +23,120 @@ const dispositionNotes: Record<Disposition, string> = {
   "wet-ink-or-counsel": "E-sign is excluded or too risky for automated flow."
 };
 
+const sampleCsv = [
+  READINESS_CSV_COLUMNS.join(","),
+  [
+    "SYN-101",
+    "Example Timber",
+    "Example Timber Limited",
+    "9429000001101",
+    "F000101",
+    "material",
+    "Casey Director",
+    "Director",
+    "casey.director@example-timber.example",
+    "director-record",
+    "tc-v4",
+    "future-and-existing",
+    "true"
+  ].join(",")
+].join("\n");
+
 export function App() {
+  const [records, setRecords] = useState<ReadinessRecord[]>(sampleRecords);
+  const [csvInput, setCsvInput] = useState(sampleCsv);
+  const [sourceLabel, setSourceLabel] = useState("Using bundled synthetic example data");
+  const [validationErrors, setValidationErrors] = useState<CsvValidationError[]>([]);
+  const evaluation = useMemo(() => evaluateCampaign(records), [records]);
+  const artifacts = useMemo(() => generateCampaignArtifacts(evaluation.records), [evaluation.records]);
+
+  function useBundledSample() {
+    setRecords(sampleRecords);
+    setValidationErrors([]);
+    setSourceLabel("Using bundled synthetic example data");
+  }
+
+  function importCsv(input: string, label: string) {
+    const result = parseReadinessCsv(input);
+    if (result.errors.length > 0) {
+      setValidationErrors(result.errors);
+      setSourceLabel("CSV validation failed; current evaluated records are unchanged");
+      return;
+    }
+
+    setRecords(result.records);
+    setValidationErrors([]);
+    setSourceLabel(
+      `Loaded ${result.records.length} local CSV ${result.records.length === 1 ? "record" : "records"} from ${label}`
+    );
+    setCsvInput(input);
+  }
+
+  function handleFileUpload(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.addEventListener("load", () => {
+      importCsv(String(reader.result ?? ""), `Uploaded ${file.name}`);
+    });
+    reader.readAsText(file);
+  }
+
   return (
     <main>
       <section className="hero">
-        <p className="eyebrow">Legal Quants residency prototype</p>
+        <p className="eyebrow">Offline BYO-data MVP</p>
         <h1>T&C e-sign remediation pipeline</h1>
         <p className="lede">
-          A small public demo showing how the real answer is not a bulk sender. The useful system turns each
-          account into a final, owned disposition: signed evidence, negotiation, wet-ink/counsel path,
-          credit-stop review, or residual human review.
+          A local-only demo for Joshua's no-signed-T&C problem. Bring your own CSV, validate it in the
+          browser, run deterministic readiness gates, and download synthetic draft artifacts for review.
         </p>
         <div className="heroActions">
+          <a href="#data">Load CSV</a>
           <a href="#diagram">View pipeline</a>
           <a href="#records">Inspect records</a>
+          <a href="#artifacts">Download artifacts</a>
         </div>
+      </section>
+
+      <section id="data" className="panel dataPanel" aria-labelledby="data-title">
+        <div className="sectionHeader">
+          <p className="eyebrow">Local data source</p>
+          <h2 id="data-title">Paste or upload a readiness CSV</h2>
+          <p>
+            The app starts with bundled synthetic example data. Pasted or uploaded CSV content is parsed in
+            this browser session only; invalid rows show validation errors before any gate evaluation changes.
+          </p>
+        </div>
+        <div className="sourceStatus">{sourceLabel}</div>
+        <div className="inputGrid">
+          <label className="csvBox">
+            <span>CSV input</span>
+            <textarea
+              value={csvInput}
+              onChange={(event) => setCsvInput(event.target.value)}
+              spellCheck={false}
+              aria-label="Readiness CSV input"
+            />
+          </label>
+          <div className="sourceControls">
+            <button type="button" onClick={() => importCsv(csvInput, "Pasted CSV")}>
+              Use pasted CSV
+            </button>
+            <label className="uploadButton">
+              Upload CSV locally
+              <input type="file" accept=".csv,text/csv" onChange={handleFileUpload} />
+            </label>
+            <button type="button" className="secondaryButton" onClick={useBundledSample}>
+              Use bundled synthetic data
+            </button>
+            <p>
+              Required columns: <code>{READINESS_CSV_COLUMNS.join(", ")}</code>
+            </p>
+          </div>
+        </div>
+        {validationErrors.length > 0 && <ValidationErrors errors={validationErrors} />}
       </section>
 
       <section id="diagram" className="panel diagramPanel" aria-labelledby="diagram-title">
@@ -44,9 +144,9 @@ export function App() {
           <p className="eyebrow">Runtime pipeline</p>
           <h2 id="diagram-title">Pipeline diagram</h2>
           <p>
-            This is the application pipeline: synthetic readiness records enter the deterministic evaluator,
-            each gate produces findings, disposition logic classifies every account, and React renders the
-            summary cards, record cards, and this diagram.
+            User CSV is parsed and validated into readiness records. The deterministic gates split clean
+            records from exceptions, then Phase 3 artifact generation creates local drafts, trackers, and
+            reports for review.
           </p>
         </div>
         <PipelineDiagram />
@@ -64,25 +164,57 @@ export function App() {
 
       <section id="records" className="panel" aria-labelledby="records-title">
         <div className="sectionHeader">
-          <p className="eyebrow">Synthetic readiness records</p>
+          <p className="eyebrow">Gate findings and dispositions</p>
           <h2 id="records-title">What the deterministic evaluator sees</h2>
+          <p>
+            Each record shows its final disposition plus every gate finding. Validation errors stay above this
+            section so malformed CSV never silently becomes an evaluated record.
+          </p>
         </div>
         <div className="recordGrid">
           {evaluation.records.map((record) => (
-            <RecordCard key={record.id} record={record} />
+            <RecordCard key={record.customerId} record={record} />
           ))}
         </div>
+      </section>
+
+      <section id="artifacts" className="panel" aria-labelledby="artifacts-title">
+        <div className="sectionHeader">
+          <p className="eyebrow">Phase 3 outputs</p>
+          <h2 id="artifacts-title">Download generated artifacts</h2>
+          <p>
+            Downloads are generated from the currently evaluated records in memory. Draft text is synthetic and
+            non-legal; trackers and reports are local CSV files for review.
+          </p>
+        </div>
+        <ArtifactDownloads artifacts={artifacts} />
       </section>
 
       <section className="panel caveat">
         <h2>What this is, and is not</h2>
         <p>
-          This demo uses synthetic records and stubbed integrations. It does not call DocuSign, NZBN, or the
-          PPSR. The point is the architecture: own the legal judgment gates, buy the signing ceremony, and
-          keep humans exactly where evidence and authority matter.
+          This demo is offline and bring-your-own-data. It is not a live sender and does not connect to
+          Miseiri, PPSR, DocuSign, email, or any customer system. Bundled records and sample artifacts are
+          synthetic.
         </p>
       </section>
     </main>
+  );
+}
+
+function ValidationErrors({ errors }: { errors: CsvValidationError[] }) {
+  return (
+    <div className="validationBox" role="alert">
+      <h3>Validation errors</h3>
+      <ul>
+        {errors.map((error, index) => (
+          <li key={`${error.row ?? "header"}-${error.column}-${index}`}>
+            {error.row ? `Row ${error.row}, ` : ""}
+            {error.column}: {error.message}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -92,7 +224,7 @@ function RecordCard({ record }: { record: EvaluatedRecord }) {
       <div className="recordTopline">
         <div>
           <h3>{record.tradingName}</h3>
-          <p>{record.legalEntity}</p>
+          <p>{record.legalName}</p>
         </div>
         <span className={`badge ${record.disposition}`}>{dispositionLabels[record.disposition]}</span>
       </div>
@@ -104,7 +236,7 @@ function RecordCard({ record }: { record: EvaluatedRecord }) {
         <div>
           <dt>Signer</dt>
           <dd>
-            {record.proposedSignatory}, {record.signatoryRole}
+            {record.signerName}, {record.signerRole}
           </dd>
         </div>
         <div>
@@ -117,12 +249,78 @@ function RecordCard({ record }: { record: EvaluatedRecord }) {
           <li key={gate.name} className={gate.status}>
             <span>{gate.name}</span>
             <strong>{gate.status}</strong>
-            {gate.findings.length > 0 && <p>{gate.findings.join("; ")}</p>}
+            {gate.findings.length > 0 && (
+              <p>
+                {gate.findings
+                  .map((finding) => `${finding.message} Next: ${finding.recommendedNextAction}`)
+                  .join(" ")}
+              </p>
+            )}
           </li>
         ))}
       </ul>
     </article>
   );
+}
+
+function ArtifactDownloads({ artifacts }: { artifacts: ReturnType<typeof generateCampaignArtifacts> }) {
+  const csvDownloads = [
+    {
+      filename: "chase-tracker.csv",
+      label: "Chase tracker",
+      description: "Clean in-chase records ready for offline review.",
+      content: artifacts.chaseTrackerCsv
+    },
+    {
+      filename: "exception-report.csv",
+      label: "Exception report",
+      description: "Gate findings and non-sendable dispositions.",
+      content: artifacts.exceptionReportCsv
+    },
+    {
+      filename: "evidence-manifest.csv",
+      label: "Evidence manifest",
+      description: "Signed synthetic records and evidence references.",
+      content: artifacts.evidenceManifestCsv
+    }
+  ];
+
+  return (
+    <div className="artifactGrid">
+      <article className="artifactCard">
+        <h3>Prefilled drafts</h3>
+        <p>{artifacts.termsDrafts.length} clean draft{artifacts.termsDrafts.length === 1 ? "" : "s"} generated.</p>
+        <div className="downloadList">
+          {artifacts.termsDrafts.length === 0 ? (
+            <span>No clean in-chase records in the current evaluation.</span>
+          ) : (
+            artifacts.termsDrafts.map((draft) => (
+              <a
+                key={draft.filename}
+                href={downloadHref(draft.content, draft.contentType)}
+                download={draft.filename}
+              >
+                {draft.filename}
+              </a>
+            ))
+          )}
+        </div>
+      </article>
+      {csvDownloads.map((download) => (
+        <article key={download.filename} className="artifactCard">
+          <h3>{download.label}</h3>
+          <p>{download.description}</p>
+          <a href={downloadHref(download.content, "text/csv")} download={download.filename}>
+            {download.filename}
+          </a>
+        </article>
+      ))}
+    </div>
+  );
+}
+
+function downloadHref(content: string, contentType: string): string {
+  return `data:${contentType};charset=utf-8,${encodeURIComponent(content)}`;
 }
 
 function PipelineDiagram() {
@@ -141,28 +339,28 @@ function PipelineDiagram() {
       <div className="pipelineGrid">
         <PipelineNode
           tone="source"
-          eyebrow="Starting batch"
-          title="~230 customers"
-          body="Existing trade-credit customers with no signed T&Cs on file after the 800-to-230 cleanup."
-          meta={["lower exposure", "existing accounts", "no T&Cs"]}
+          eyebrow="Input"
+          title="User CSV"
+          body="Bundled synthetic data by default, or a locally pasted/uploaded readiness CSV."
+          meta={["BYO data", "offline", "synthetic sample"]}
         />
 
         <Connector label="scope" />
 
         <PipelineNode
           tone="compute"
-          eyebrow="Prepare"
-          title="Segment + enrich"
-          body="Use exposure bands, Miseiri/NZBN data, contact details, and PPSR references to create a readiness record."
-          meta={["Miseiri", "NZBN", "PPSR refs"]}
+          eyebrow="Parse"
+          title="Parse + validate"
+          body="Check required columns and allowed values before any readiness gates run."
+          meta={["CSV schema", "row errors", "no network"]}
         />
 
         <Connector label="readiness" />
 
         <div className="gateStack" aria-label="Pre-send verification gates">
-          <PipelineNode tone="gate" eyebrow="Gate A" title="Entity match" body="Canonical legal name, NZBN status, trading-name mismatch, and PPSR debtor alignment." />
-          <PipelineNode tone="gate" eyebrow="Gate B" title="Signer authority" body="Named signer, role, delivery email, authority evidence, and escalation tier." />
-          <PipelineNode tone="gate" eyebrow="Gate C" title="T&C package" body="Locked standard terms, approved merge fields, security clause, and e-sign eligibility." />
+          <PipelineNode tone="gate" eyebrow="Records" title="Readiness records" body="Validated rows become the deterministic input record for each account." />
+          <PipelineNode tone="gate" eyebrow="Gates" title="Entity + authority + T&C" body="Findings identify blockers and review items before any draft is generated." />
+          <PipelineNode tone="gate" eyebrow="Disposition" title="Final state" body="Each account lands in chase, signed evidence, negotiation, credit-stop, wet-ink, or review." />
         </div>
 
         <Connector label="exceptions" />
@@ -170,17 +368,17 @@ function PipelineDiagram() {
         <PipelineNode
           tone="router"
           eyebrow="Route"
-          title="Exception queue"
-          body="Auto-send clean records; route mismatches, authority gaps, negotiation, or wet-ink cases to humans."
-          meta={["auto-send", "human review", "wet-ink"]}
+          title="Clean / exception split"
+          body="Clean records feed local draft generation; flagged or non-sendable records move to the exception queue."
+          meta={["clean records", "exception queue", "human review"]}
         />
 
         <Connector label="campaign" />
 
         <div className="outputStack" aria-label="Campaign outputs">
-          <PipelineNode tone="output" eyebrow="Send" title="Prefilled envelopes" body="Generate standard T&Cs with verified customer details and route for online signature." />
-          <PipelineNode tone="output" eyebrow="Operate" title="Chase loop" body="Track opened, signed, refused, negotiated, bounced, and non-responsive accounts." />
-          <PipelineNode tone="output" eyebrow="Close" title="Evidence + PPSR" body="Store signed agreement and audit trail; link or remediate PPSR records where needed." />
+          <PipelineNode tone="output" eyebrow="Draft" title="Prefilled drafts" body="Generate local synthetic HTML drafts for clean in-chase records." />
+          <PipelineNode tone="output" eyebrow="Track" title="Chase tracker" body="Export local CSVs for chase work, exception review, and evidence manifesting." />
+          <PipelineNode tone="output" eyebrow="Report" title="Exception + evidence" body="Download the exception report and evidence manifest for human review." />
         </div>
       </div>
     </div>

@@ -2,17 +2,18 @@ import { describe, expect, it } from "vitest";
 import { evaluateCampaign, type ReadinessRecord } from "./pipeline";
 
 const cleanRecord: ReadinessRecord = {
-  id: "ACME-001",
+  customerId: "ACME-001",
   tradingName: "Acme Supply",
-  legalEntity: "Acme Supply Limited",
+  legalName: "Acme Supply Limited",
   nzbn: "9429000000001",
+  ppsrRegistrationNumber: "F000001",
   entityStatus: "active",
   ppsrDebtorMatches: true,
   exposureBand: "material",
-  proposedSignatory: "Mia Director",
-  signatoryRole: "Director",
+  signerName: "Mia Director",
+  signerRole: "Director",
+  signerEmail: "mia.director@acme.example",
   authorityEvidence: "director-record",
-  deliveryEmail: "mia.director@acme.example",
   emailConfidence: "verified",
   templateVersion: "tc-v4",
   collateralClauseApproved: true,
@@ -30,16 +31,13 @@ describe("evaluateCampaign", () => {
     expect(result.summary["signed-evidenced"]).toBe(1);
   });
 
-  it("routes entity and authority problems to human review before sending", () => {
+  it("returns structured findings for a PPSR debtor mismatch", () => {
     const result = evaluateCampaign([
       {
         ...cleanRecord,
-        id: "GROUP-002",
-        legalEntity: "Acme Holdings Limited",
+        customerId: "GROUP-002",
+        legalName: "Acme Holdings Limited",
         ppsrDebtorMatches: false,
-        proposedSignatory: "Sam Manager",
-        signatoryRole: "Operations Manager",
-        authorityEvidence: "none",
         customerResponse: "not-sent"
       }
     ]);
@@ -50,17 +48,103 @@ describe("evaluateCampaign", () => {
     expect(evaluated.gates).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          name: "Debtor / PPSR",
+          name: "Gate A - Entity / PPSR",
           status: "flagged",
-          findings: expect.arrayContaining(["PPSR debtor does not match verified legal entity"])
-        }),
-        expect.objectContaining({
-          name: "Authority / Delivery",
-          status: "flagged",
-          findings: expect.arrayContaining(["No authority evidence recorded for proposed signer"])
+          findings: expect.arrayContaining([
+            {
+              severity: "blocker",
+              code: "PPSR_DEBTOR_MISMATCH",
+              message: "PPSR debtor does not match the verified legal entity.",
+              recommendedNextAction: "Verify the debtor record before sending standard T&Cs."
+            }
+          ])
         })
       ])
     );
+  });
+
+  it("flags weak authority evidence for a material account", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "AUTH-004",
+        signerName: "Sam Manager",
+        signerRole: "Operations Manager",
+        authorityEvidence: "account-owner-confirmed",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate B - Signer Authority",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            {
+              severity: "review",
+              code: "AUTHORITY_WEAK_FOR_MATERIAL_ACCOUNT",
+              message: "Material accounts need stronger authority evidence than account-owner confirmation.",
+              recommendedNextAction: "Collect director, delegated authority, customer certificate, or legal-approved evidence."
+            }
+          ])
+        })
+      ])
+    );
+  });
+
+  it("routes e-sign ineligible records to wet-ink or counsel", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "WET-005",
+        eSignEligible: false,
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("wet-ink-or-counsel");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate C - T&C Package",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            {
+              severity: "blocker",
+              code: "ESIGN_INELIGIBLE",
+              message: "Record is not eligible for the e-sign path.",
+              recommendedNextAction: "Route to wet-ink signature or counsel review before proceeding."
+            }
+          ])
+        })
+      ])
+    );
+  });
+
+  it("auto-sends clean records that have not yet been sent", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "SEND-006",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("in-chase");
+    expect(evaluated.gates).toHaveLength(3);
+    expect(evaluated.gates).toEqual([
+      { name: "Gate A - Entity / PPSR", status: "clear", findings: [] },
+      { name: "Gate B - Signer Authority", status: "clear", findings: [] },
+      { name: "Gate C - T&C Package", status: "clear", findings: [] }
+    ]);
   });
 
   it("separates refusal outcomes from clean signatures", () => {
@@ -68,7 +152,7 @@ describe("evaluateCampaign", () => {
       cleanRecord,
       {
         ...cleanRecord,
-        id: "REFUSE-003",
+        customerId: "REFUSE-003",
         customerResponse: "refused",
         exposureBand: "low"
       }

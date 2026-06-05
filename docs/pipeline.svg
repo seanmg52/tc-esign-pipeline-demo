@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 560" role="img" aria-labelledby="title desc">
-  <title id="title">230-customer T&amp;C signature pipeline</title>
-  <desc id="desc">A light product-style pipeline diagram for taking about 230 New Zealand trade-credit customers with no T&amp;Cs through segmentation, enrichment, verification, prefilled e-sign envelopes, chase, and evidence/PPSR closeout.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" role="img" aria-labelledby="title desc">
+  <title id="title">Offline T&amp;C pipeline MVP</title>
+  <desc id="desc">User CSV flows through local parse and validation, readiness records, deterministic gates, clean records and exception queue, then local downloadable drafts, chase tracker, exception report, and evidence manifest.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
@@ -22,75 +22,99 @@
       <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#334155" flood-opacity="0.16"/>
     </filter>
     <style>
-      .canvas{fill:url(#bg)}.glowA{fill:url(#glowA)}.glowB{fill:url(#glowB)}.grid{stroke:rgba(59,130,246,.07);stroke-width:1}.chrome{fill:rgba(255,255,255,.78);stroke:rgba(99,102,241,.16);stroke-width:1}.dotR{fill:#fb7185}.dotY{fill:#facc15}.dotG{fill:#34d399}.muted{fill:#64748b;font:800 13px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.title{fill:#172033;font:800 17px Inter,Arial,sans-serif}.body{fill:#475569;font:600 13px Inter,Arial,sans-serif}.node{fill:rgba(255,255,255,.92);stroke:rgba(99,102,241,.16);stroke-width:1.2;filter:url(#shadow)}.source{stroke:#60a5fa;stroke-opacity:.5}.compute{stroke:#14b8a6;stroke-opacity:.55}.gate{stroke:#94a3b8;stroke-opacity:.34}.router{fill:rgba(238,242,255,.96);stroke:#a78bfa;stroke-opacity:.65}.output{stroke:#fb923c;stroke-opacity:.62}.edge{fill:none;stroke:#2563eb;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.76}.small{fill:#0f766e;font:800 11px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+      .canvas{fill:url(#bg)}.glowA{fill:url(#glowA)}.glowB{fill:url(#glowB)}.grid{stroke:rgba(59,130,246,.07);stroke-width:1}.chrome{fill:rgba(255,255,255,.78);stroke:rgba(99,102,241,.16);stroke-width:1}.dotR{fill:#fb7185}.dotY{fill:#facc15}.dotG{fill:#34d399}.muted{fill:#64748b;font:800 13px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.title{fill:#172033;font:800 17px Inter,Arial,sans-serif}.body{fill:#475569;font:600 13px Inter,Arial,sans-serif}.node{fill:rgba(255,255,255,.94);stroke:rgba(99,102,241,.16);stroke-width:1.2;filter:url(#shadow)}.source{stroke:#60a5fa;stroke-opacity:.5}.compute{stroke:#14b8a6;stroke-opacity:.55}.records{stroke:#a78bfa;stroke-opacity:.62}.gate{stroke:#94a3b8;stroke-opacity:.4}.clean{stroke:#22c55e;stroke-opacity:.65}.exception{stroke:#fb7185;stroke-opacity:.65}.output{stroke:#fb923c;stroke-opacity:.62}.edge{fill:none;stroke:#2563eb;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.76}.small{fill:#0f766e;font:800 11px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
     </style>
   </defs>
-  <rect class="canvas" width="1280" height="560" rx="32"/>
-  <rect class="glowA" width="1280" height="560" rx="32"/>
-  <rect class="glowB" width="1280" height="560" rx="32"/>
-  <path class="grid" d="M80 0V560M160 0V560M240 0V560M320 0V560M400 0V560M480 0V560M560 0V560M640 0V560M720 0V560M800 0V560M880 0V560M960 0V560M1040 0V560M1120 0V560M1200 0V560M0 80H1280M0 160H1280M0 240H1280M0 320H1280M0 400H1280M0 480H1280"/>
+  <rect class="canvas" width="1280" height="620" rx="32"/>
+  <rect class="glowA" width="1280" height="620" rx="32"/>
+  <rect class="glowB" width="1280" height="620" rx="32"/>
+  <path class="grid" d="M80 0V620M160 0V620M240 0V620M320 0V620M400 0V620M480 0V620M560 0V620M640 0V620M720 0V620M800 0V620M880 0V620M960 0V620M1040 0V620M1120 0V620M1200 0V620M0 80H1280M0 160H1280M0 240H1280M0 320H1280M0 400H1280M0 480H1280M0 560H1280"/>
   <rect class="chrome" x="42" y="34" width="1196" height="54" rx="18"/>
   <circle class="dotR" cx="70" cy="61" r="6"/><circle class="dotY" cx="91" cy="61" r="6"/><circle class="dotG" cx="112" cy="61" r="6"/>
-  <text class="title" x="150" y="67">230-customer T&amp;C signature pipeline</text>
-  <text class="small" x="1085" y="66">NZ trade credit</text>
+  <text class="title" x="150" y="67">Offline T&amp;C pipeline MVP</text>
+  <text class="small" x="1055" y="66">local BYO-data</text>
 
-  <path class="edge" d="M206 304H285"/>
-  <path class="edge" d="M440 304C500 304 500 214 565 214"/>
-  <path class="edge" d="M440 304H565"/>
-  <path class="edge" d="M440 304C500 304 500 394 565 394"/>
-  <path class="edge" d="M746 214C790 214 806 292 850 302"/>
-  <path class="edge" d="M746 304H850"/>
-  <path class="edge" d="M746 394C790 394 806 316 850 306"/>
-  <path class="edge" d="M1004 304C1040 304 1044 252 1082 238"/>
-  <path class="edge" d="M1004 304H1082"/>
-  <path class="edge" d="M1004 304C1040 304 1044 356 1082 370"/>
+  <path class="edge" d="M198 304H270"/>
+  <path class="edge" d="M430 304H502"/>
+  <path class="edge" d="M662 304H734"/>
+  <path class="edge" d="M894 274C936 274 946 224 990 212"/>
+  <path class="edge" d="M894 334C936 334 946 392 990 406"/>
+  <path class="edge" d="M1112 170C1144 170 1154 150 1186 142"/>
+  <path class="edge" d="M1112 240C1144 240 1154 256 1186 262"/>
+  <path class="edge" d="M1112 368C1144 368 1154 378 1186 382"/>
+  <path class="edge" d="M1112 446C1144 446 1154 468 1186 478"/>
 
-  <g transform="translate(72 224)">
+  <g transform="translate(58 224)">
     <rect class="node source" width="170" height="160" rx="22"/>
-    <text class="muted" x="20" y="32">Starting batch</text>
-    <text class="title" x="20" y="62">~230 customers</text>
-    <text class="body" x="20" y="92">Existing trade-credit</text>
-    <text class="body" x="20" y="113">customers with no</text>
-    <text class="body" x="20" y="134">signed T&amp;Cs.</text>
+    <text class="muted" x="20" y="32">Input</text>
+    <text class="title" x="20" y="62">User CSV</text>
+    <text class="body" x="20" y="92">Paste or upload</text>
+    <text class="body" x="20" y="113">local readiness</text>
+    <text class="body" x="20" y="134">data.</text>
   </g>
-  <g transform="translate(285 232)">
+  <g transform="translate(270 232)">
     <rect class="node compute" width="190" height="144" rx="22"/>
-    <text class="muted" x="20" y="32">Prepare</text>
-    <text class="title" x="20" y="62">Segment + enrich</text>
-    <text class="body" x="20" y="92">Exposure bands,</text>
-    <text class="body" x="20" y="113">Miseiri/NZBN data,</text>
-    <text class="body" x="20" y="134">PPSR references.</text>
+    <text class="muted" x="20" y="32">Parse</text>
+    <text class="title" x="20" y="62">Parse / validate</text>
+    <text class="body" x="20" y="92">Check required</text>
+    <text class="body" x="20" y="113">columns and</text>
+    <text class="body" x="20" y="134">allowed values.</text>
   </g>
-  <g transform="translate(565 174)">
-    <rect class="node gate" width="210" height="80" rx="18"/>
-    <text class="muted" x="18" y="29">Gate A</text><text class="title" x="18" y="55">Entity match</text>
+  <g transform="translate(502 232)">
+    <rect class="node records" width="190" height="144" rx="22"/>
+    <text class="muted" x="20" y="32">Normalize</text>
+    <text class="title" x="20" y="62">Readiness records</text>
+    <text class="body" x="20" y="92">One structured</text>
+    <text class="body" x="20" y="113">record per</text>
+    <text class="body" x="20" y="134">account.</text>
   </g>
-  <g transform="translate(565 264)">
-    <rect class="node gate" width="210" height="80" rx="18"/>
-    <text class="muted" x="18" y="29">Gate B</text><text class="title" x="18" y="55">Signer authority</text>
+  <g transform="translate(734 170)">
+    <rect class="node gate" width="190" height="92" rx="18"/>
+    <text class="muted" x="18" y="30">Gate A</text>
+    <text class="title" x="18" y="58">Entity / PPSR</text>
   </g>
-  <g transform="translate(565 354)">
-    <rect class="node gate" width="210" height="80" rx="18"/>
-    <text class="muted" x="18" y="29">Gate C</text><text class="title" x="18" y="55">T&amp;C package</text>
+  <g transform="translate(734 278)">
+    <rect class="node gate" width="190" height="92" rx="18"/>
+    <text class="muted" x="18" y="30">Gate B</text>
+    <text class="title" x="18" y="58">Signer authority</text>
   </g>
-  <g transform="translate(850 224)">
-    <rect class="node router" width="190" height="160" rx="24"/>
-    <text class="muted" x="20" y="32">Route</text>
+  <g transform="translate(734 386)">
+    <rect class="node gate" width="190" height="92" rx="18"/>
+    <text class="muted" x="18" y="30">Gate C</text>
+    <text class="title" x="18" y="58">T&amp;C package</text>
+  </g>
+  <g transform="translate(990 126)">
+    <rect class="node clean" width="170" height="116" rx="22"/>
+    <text class="muted" x="20" y="32">Clear path</text>
+    <text class="title" x="20" y="62">Clean records</text>
+    <text class="body" x="20" y="92">Ready for local</text>
+    <text class="body" x="20" y="113">draft output.</text>
+  </g>
+  <g transform="translate(990 360)">
+    <rect class="node exception" width="170" height="116" rx="22"/>
+    <text class="muted" x="20" y="32">Review path</text>
     <text class="title" x="20" y="62">Exception queue</text>
-    <text class="body" x="20" y="92">Auto-send clean</text>
-    <text class="body" x="20" y="113">records; humans</text>
-    <text class="body" x="20" y="134">handle flags.</text>
+    <text class="body" x="20" y="92">Flags, negotiation,</text>
+    <text class="body" x="20" y="113">wet ink, refusal.</text>
   </g>
-  <g transform="translate(1082 194)">
-    <rect class="node output" width="166" height="88" rx="18"/>
-    <text class="muted" x="18" y="29">Send</text><text class="title" x="18" y="56">Prefilled envelopes</text>
+  <g transform="translate(1186 104)">
+    <rect class="node output" width="70" height="74" rx="16"/>
+    <text class="title" x="14" y="32">Drafts</text>
+    <text class="body" x="14" y="54">HTML</text>
   </g>
-  <g transform="translate(1082 304)">
-    <rect class="node output" width="166" height="88" rx="18"/>
-    <text class="muted" x="18" y="29">Operate</text><text class="title" x="18" y="56">Chase loop</text>
+  <g transform="translate(1186 224)">
+    <rect class="node output" width="70" height="74" rx="16"/>
+    <text class="title" x="14" y="32">Chase</text>
+    <text class="body" x="14" y="54">CSV</text>
   </g>
-  <g transform="translate(1082 414)">
-    <rect class="node output" width="166" height="88" rx="18"/>
-    <text class="muted" x="18" y="29">Close</text><text class="title" x="18" y="56">Evidence + PPSR</text>
+  <g transform="translate(1186 344)">
+    <rect class="node output" width="70" height="74" rx="16"/>
+    <text class="title" x="14" y="32">Report</text>
+    <text class="body" x="14" y="54">CSV</text>
+  </g>
+  <g transform="translate(1186 464)">
+    <rect class="node output" width="70" height="74" rx="16"/>
+    <text class="title" x="14" y="32">Manifest</text>
+    <text class="body" x="14" y="54">CSV</text>
   </g>
 </svg>

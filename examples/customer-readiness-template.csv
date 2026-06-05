@@ -1,0 +1,4 @@
+customer_id,trading_name,legal_name,nzbn,ppsr_registration_number,exposure_band,signer_name,signer_role,signer_email,authority_evidence,template_version,coverage,e_sign_eligible
+SYN-001,Kauri Supplies,Kauri Supplies Limited,9429000001001,F123456,material,Aroha Director,Director,aroha.director@kauri.example,director-record,tc-v4,future-and-existing,true
+SYN-002,Rimu Hardware,Rimu Hardware Limited,9429000001002,F123457,low,Theo Owner,Owner,theo.owner@rimu.example,account-owner-confirmed,tc-v4,future-only,true
+SYN-003,Matai Freight,Matai Freight Limited,9429000001003,F123458,high,Leah Finance,Chief Financial Officer,leah.finance@matai.example,delegated-authority,tc-v4,counsel-review,false
