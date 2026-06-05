@@ -152,7 +152,7 @@ function PipelineDiagram() {
         <PipelineNode
           tone="compute"
           eyebrow="Evaluator"
-          title="evaluateCampaign()"
+          title="Campaign evaluator"
           body="Maps each account through deterministic gates, then aggregates disposition counts."
           meta={["evaluateRecord()", "summary reducer", "pure TypeScript"]}
         />
@@ -170,7 +170,7 @@ function PipelineDiagram() {
         <PipelineNode
           tone="router"
           eyebrow="Router"
-          title="chooseDisposition()"
+          title="Disposition router"
           body="Combines gate status with customer response to classify the account."
           meta={["signed", "human review", "negotiation", "credit-stop", "wet-ink"]}
         />

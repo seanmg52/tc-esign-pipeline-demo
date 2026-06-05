@@ -117,16 +117,16 @@ h3 {
 .pipelineCanvas {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  border: 1px solid rgba(99, 102, 241, 0.16);
   border-radius: 28px;
   padding: 18px;
   background:
-    radial-gradient(circle at 18% 12%, rgba(45, 212, 191, 0.26), transparent 28%),
-    radial-gradient(circle at 72% 8%, rgba(129, 140, 248, 0.26), transparent 30%),
-    linear-gradient(135deg, #0f172a 0%, #111827 52%, #1e1b4b 100%);
+    radial-gradient(circle at 18% 12%, rgba(20, 184, 166, 0.16), transparent 28%),
+    radial-gradient(circle at 74% 8%, rgba(99, 102, 241, 0.14), transparent 32%),
+    linear-gradient(135deg, #ffffff 0%, #f8fbff 52%, #eef2ff 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 24px 70px rgba(15, 23, 42, 0.32);
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 24px 70px rgba(59, 72, 112, 0.16);
 }
 
 .pipelineCanvas::before {
@@ -134,8 +134,8 @@ h3 {
   inset: 0;
   content: "";
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    linear-gradient(rgba(59, 130, 246, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.07) 1px, transparent 1px);
   background-size: 28px 28px;
   mask-image: linear-gradient(to bottom, black, transparent 92%);
   pointer-events: none;
@@ -156,9 +156,10 @@ h3 {
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 18px;
   padding: 10px 12px;
-  background: rgba(15, 23, 42, 0.62);
-  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.76);
+  color: #64748b;
   font-size: 0.82rem;
+  backdrop-filter: blur(16px);
 }
 
 .chromeDot {
@@ -182,7 +183,7 @@ h3 {
 }
 
 .chromeTitle {
-  color: #e2e8f0;
+  color: #172033;
   font-weight: 800;
 }
 
@@ -191,7 +192,7 @@ h3 {
   border-radius: 999px;
   padding: 5px 9px;
   background: rgba(20, 184, 166, 0.1);
-  color: #99f6e4;
+  color: #0f766e;
   font-weight: 800;
 }
 
@@ -210,12 +211,12 @@ h3 {
   border-radius: 22px;
   padding: 16px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.055)),
-    rgba(15, 23, 42, 0.72);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.9)),
+    rgba(255, 255, 255, 0.88);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    0 20px 50px rgba(0, 0, 0, 0.25);
-  color: #f8fafc;
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 18px 42px rgba(51, 65, 85, 0.14);
+  color: #172033;
 }
 
 .pipelineNode strong {
@@ -223,17 +224,19 @@ h3 {
   margin: 6px 0 8px;
   font-size: 1rem;
   letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
 }
 
 .pipelineNode p {
   margin-bottom: 0;
-  color: #cbd5e1;
+  color: #475569;
   font-size: 0.84rem;
   line-height: 1.45;
+  overflow-wrap: break-word;
 }
 
 .pipelineCanvas .pipelineNode p {
-  color: #cbd5e1;
+  color: #475569;
 }
 
 .pipelineNode.source {
@@ -253,8 +256,8 @@ h3 {
 .pipelineNode.router {
   border-color: rgba(167, 139, 250, 0.42);
   background:
-    linear-gradient(180deg, rgba(139, 92, 246, 0.22), rgba(255, 255, 255, 0.06)),
-    rgba(15, 23, 42, 0.82);
+    linear-gradient(180deg, rgba(238, 242, 255, 0.96), rgba(255, 255, 255, 0.9)),
+    rgba(255, 255, 255, 0.9);
 }
 
 .pipelineNode.output {
@@ -266,7 +269,7 @@ h3 {
 }
 
 .nodeEyebrow {
-  color: #94a3b8;
+  color: #64748b;
   font-size: 0.68rem;
   font-weight: 900;
   letter-spacing: 0.14em;
@@ -281,11 +284,11 @@ h3 {
 }
 
 .nodeMeta span {
-  border: 1px solid rgba(226, 232, 240, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.12);
   border-radius: 999px;
   padding: 4px 7px;
-  background: rgba(255, 255, 255, 0.07);
-  color: #e2e8f0;
+  background: rgba(238, 242, 255, 0.72);
+  color: #334155;
   font-size: 0.68rem;
   font-weight: 800;
 }
@@ -308,7 +311,7 @@ h3 {
   left: 6px;
   height: 2px;
   content: "";
-  background: linear-gradient(90deg, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.9));
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.16), rgba(37, 99, 235, 0.75));
 }
 
 .connector::after {
@@ -318,8 +321,8 @@ h3 {
   width: 10px;
   height: 10px;
   content: "";
-  border-top: 2px solid rgba(45, 212, 191, 0.95);
-  border-right: 2px solid rgba(45, 212, 191, 0.95);
+  border-top: 2px solid rgba(37, 99, 235, 0.82);
+  border-right: 2px solid rgba(37, 99, 235, 0.82);
   transform: rotate(45deg);
 }
 
@@ -328,7 +331,7 @@ h3 {
   top: calc(50% + 10px);
   left: 50%;
   transform: translateX(-50%);
-  color: #5eead4;
+  color: #2563eb;
   font-size: 0.64rem;
   font-weight: 900;
   letter-spacing: 0.08em;
@@ -340,17 +343,17 @@ h3 {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
   align-items: center;
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  border: 1px solid rgba(99, 102, 241, 0.14);
   border-radius: 22px;
   margin-top: 8px;
   padding: 16px;
-  background: rgba(15, 23, 42, 0.48);
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .railLine {
   height: 2px;
   margin: 0 14px;
-  background: linear-gradient(90deg, rgba(129, 140, 248, 0.2), rgba(129, 140, 248, 0.95));
+  background: linear-gradient(90deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.8));
 }
 
 .railLine::after {
@@ -360,8 +363,8 @@ h3 {
   height: 10px;
   margin-top: -4px;
   content: "";
-  border-top: 2px solid rgba(129, 140, 248, 0.95);
-  border-right: 2px solid rgba(129, 140, 248, 0.95);
+  border-top: 2px solid rgba(99, 102, 241, 0.85);
+  border-right: 2px solid rgba(99, 102, 241, 0.85);
   transform: rotate(45deg);
 }
 

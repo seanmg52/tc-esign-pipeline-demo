@@ -1,28 +1,28 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
   <title id="title">Application pipeline for the T&amp;C e-sign demo</title>
-  <desc id="desc">A polished dark-canvas pipeline diagram showing synthetic records entering a deterministic evaluator, flowing through three gates, routing to dispositions, rendering UI outputs, and deploying through GitHub Pages.</desc>
+  <desc id="desc">A polished light pipeline diagram showing synthetic records entering a deterministic evaluator, flowing through three gates, routing to dispositions, rendering UI outputs, and deploying through GitHub Pages.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f172a"/>
-      <stop offset="0.55" stop-color="#111827"/>
-      <stop offset="1" stop-color="#1e1b4b"/>
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="0.55" stop-color="#f8fbff"/>
+      <stop offset="1" stop-color="#eef2ff"/>
     </linearGradient>
     <radialGradient id="glowA" cx="18%" cy="12%" r="38%">
-      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.32"/>
+      <stop offset="0" stop-color="#14b8a6" stop-opacity="0.18"/>
       <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
     </radialGradient>
     <radialGradient id="glowB" cx="75%" cy="8%" r="36%">
-      <stop offset="0" stop-color="#818cf8" stop-opacity="0.34"/>
+      <stop offset="0" stop-color="#6366f1" stop-opacity="0.16"/>
       <stop offset="1" stop-color="#818cf8" stop-opacity="0"/>
     </radialGradient>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5eead4"/>
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
     </marker>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.28"/>
+      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#334155" flood-opacity="0.16"/>
     </filter>
     <style>
-      .canvas{fill:url(#bg)}.glowA{fill:url(#glowA)}.glowB{fill:url(#glowB)}.grid{stroke:rgba(255,255,255,.05);stroke-width:1}.chrome{fill:rgba(15,23,42,.72);stroke:rgba(148,163,184,.22);stroke-width:1}.dotR{fill:#fb7185}.dotY{fill:#facc15}.dotG{fill:#34d399}.muted{fill:#94a3b8;font:800 13px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.title{fill:#f8fafc;font:800 18px Inter,Arial,sans-serif}.body{fill:#cbd5e1;font:600 13px Inter,Arial,sans-serif}.pillText{fill:#e2e8f0;font:800 11px Inter,Arial,sans-serif}.node{fill:rgba(15,23,42,.78);stroke:rgba(226,232,240,.16);stroke-width:1.2;filter:url(#shadow)}.source{stroke:#60a5fa;stroke-opacity:.44}.compute,.deploy{stroke:#2dd4bf;stroke-opacity:.5}.gate{stroke:#e2e8f0;stroke-opacity:.24}.router{fill:rgba(76,29,149,.48);stroke:#a78bfa;stroke-opacity:.58}.output{stroke:#fb923c;stroke-opacity:.58}.test{stroke:#94a3b8;stroke-opacity:.44}.edge{fill:none;stroke:#5eead4;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.86}.edge2{fill:none;stroke:#818cf8;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.8}.small{fill:#99f6e4;font:800 11px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.rail{fill:rgba(15,23,42,.55);stroke:rgba(148,163,184,.16);stroke-width:1}
+      .canvas{fill:url(#bg)}.glowA{fill:url(#glowA)}.glowB{fill:url(#glowB)}.grid{stroke:rgba(59,130,246,.07);stroke-width:1}.chrome{fill:rgba(255,255,255,.78);stroke:rgba(99,102,241,.16);stroke-width:1}.dotR{fill:#fb7185}.dotY{fill:#facc15}.dotG{fill:#34d399}.muted{fill:#64748b;font:800 13px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.title{fill:#172033;font:800 17px Inter,Arial,sans-serif}.body{fill:#475569;font:600 13px Inter,Arial,sans-serif}.pillText{fill:#334155;font:800 11px Inter,Arial,sans-serif}.node{fill:rgba(255,255,255,.92);stroke:rgba(99,102,241,.16);stroke-width:1.2;filter:url(#shadow)}.source{stroke:#60a5fa;stroke-opacity:.5}.compute,.deploy{stroke:#14b8a6;stroke-opacity:.55}.gate{stroke:#94a3b8;stroke-opacity:.34}.router{fill:rgba(238,242,255,.96);stroke:#a78bfa;stroke-opacity:.65}.output{stroke:#fb923c;stroke-opacity:.62}.test{stroke:#94a3b8;stroke-opacity:.5}.edge{fill:none;stroke:#2563eb;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.76}.edge2{fill:none;stroke:#6366f1;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.72}.small{fill:#0f766e;font:800 11px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.rail{fill:rgba(255,255,255,.58);stroke:rgba(99,102,241,.14);stroke-width:1}
     </style>
   </defs>
   <rect class="canvas" width="1280" height="720" rx="32"/>
@@ -58,7 +58,7 @@
   <g transform="translate(285 232)">
     <rect class="node compute" width="190" height="144" rx="22"/>
     <text class="muted" x="20" y="32">Evaluator</text>
-    <text class="title" x="20" y="62">evaluateCampaign()</text>
+    <text class="title" x="20" y="62">Campaign evaluator</text>
     <text class="body" x="20" y="92">Maps each account</text>
     <text class="body" x="20" y="113">through gates, then</text>
     <text class="body" x="20" y="134">counts dispositions.</text>
@@ -78,7 +78,7 @@
   <g transform="translate(850 224)">
     <rect class="node router" width="190" height="160" rx="24"/>
     <text class="muted" x="20" y="32">Router</text>
-    <text class="title" x="20" y="62">chooseDisposition()</text>
+    <text class="title" x="20" y="62">Disposition router</text>
     <text class="body" x="20" y="92">Gate flag?</text>
     <text class="body" x="20" y="113">Customer response?</text>
     <text class="body" x="20" y="134">Final state.</text>
@@ -102,7 +102,7 @@
   </g>
   <g transform="translate(510 526)">
     <rect class="node compute" width="260" height="72" rx="18"/>
-    <text class="muted" x="18" y="28">GitHub Actions</text><text class="title" x="18" y="54">npm ci ’ test ’ build</text>
+    <text class="muted" x="18" y="28">GitHub Actions</text><text class="title" x="18" y="54">npm ci ? test ? build</text>
   </g>
   <g transform="translate(978 526)">
     <rect class="node deploy" width="200" height="72" rx="18"/>
