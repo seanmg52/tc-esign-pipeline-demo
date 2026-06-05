@@ -12,6 +12,10 @@ After GitHub Pages deploys, the demo is available at:
 
 `https://seanmg52.github.io/tc-esign-pipeline-demo/`
 
+Standalone pipeline diagram:
+
+`https://seanmg52.github.io/tc-esign-pipeline-demo/pipeline.svg`
+
 ## What It Shows
 
 - A deterministic readiness-record evaluator.

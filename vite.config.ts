@@ -3,5 +3,6 @@ import react from "@vitejs/plugin-react";
 
 export default defineConfig({
   plugins: [react()],
-  base: "/tc-esign-pipeline-demo/"
+  base: "/tc-esign-pipeline-demo/",
+  publicDir: "docs"
 });
