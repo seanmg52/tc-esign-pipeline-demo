@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 900" role="img" aria-labelledby="title desc">
+  <title id="title">Judgment-led T&amp;C e-sign remediation pipeline</title>
+  <desc id="desc">A hand-drawn-style flow chart showing judgment before plumbing, owned verification gates, narrow e-sign tooling, and evidence hardening.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3c4353"/>
+    </marker>
+    <style>
+      .bg{fill:#fbf8ef}.flow{fill:none;stroke:#3c4353;stroke-linecap:round;stroke-width:2;marker-end:url(#arrow);opacity:.72}.thin{stroke-width:1.5;opacity:.45}.owned{fill:rgba(251,244,159,.42);stroke:rgba(167,152,55,.45)}.judgment{fill:#111827;stroke:#f2a93b;stroke-width:4}.diamond,.note{stroke:rgba(31,41,55,.18);stroke-width:2}.lav{fill:#ddd9fb}.gray{fill:#e7e7e7}.blue{fill:#e6edff}.green{fill:#bde7d4}.orange{fill:#ffd7bf}.white{fill:#f7f7f7}.txt{fill:#172033;font:700 15px Inter,Arial,sans-serif}.light{fill:white}.zone{fill:#716823;font:800 15px Inter,Arial,sans-serif}
+    </style>
+  </defs>
+  <rect class="bg" width="820" height="900"/>
+  <path class="flow" d="M410 96 C230 120 190 235 255 330"/>
+  <path class="flow" d="M410 96 C600 130 645 230 585 335"/>
+  <path class="flow" d="M235 430 C150 535 185 665 330 720"/>
+  <path class="flow" d="M590 430 C680 555 630 700 470 735"/>
+  <path class="flow" d="M410 775 C410 820 410 840 410 862"/>
+  <path class="flow thin" d="M680 78 C760 210 760 610 510 785"/>
+  <rect class="owned" x="95" y="270" width="350" height="360" rx="8"/>
+  <text class="zone" x="120" y="300">owned workflow: small, portable, inspectable</text>
+  <g transform="translate(410 90)">
+    <polygon class="judgment" points="0,-78 90,0 0,78 -90,0"/>
+    <text class="txt light" text-anchor="middle"><tspan x="0" y="-16">JUDGMENT decides</tspan><tspan x="0" y="4">what should be built</tspan><tspan x="0" y="24">and what should not</tspan></text>
+  </g>
+  <g transform="translate(680 70)">
+    <rect class="note blue" x="-88" y="-34" width="176" height="68" rx="4"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-8">Start from a real problem,</tspan><tspan x="0" y="12">not the plumbing</tspan></text>
+  </g>
+  <g transform="translate(250 210)">
+    <polygon class="diamond lav" points="0,-72 82,0 0,72 -82,0"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-12">Pilot 25-40 accounts.</tspan><tspan x="0" y="8">Is automation worth it?</tspan><tspan x="0" y="28">Measure exception rate.</tspan></text>
+  </g>
+  <g transform="translate(250 400)">
+    <polygon class="diamond lav" points="0,-62 75,0 0,62 -75,0"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-10">Gate A/B/C:</tspan><tspan x="0" y="10">debtor, authority,</tspan><tspan x="0" y="30">content + e-sign</tspan></text>
+  </g>
+  <g transform="translate(220 555)">
+    <rect class="note green" x="-102" y="-42" width="204" height="84" rx="4"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-12">Own the readiness record,</tspan><tspan x="0" y="8">exceptions, and evidence.</tspan><tspan x="0" y="28">Not the platform.</tspan></text>
+  </g>
+  <g transform="translate(575 380)">
+    <rect class="note orange" x="-112" y="-54" width="224" height="108" rx="4"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-18">Only now use a narrow tool:</tspan><tspan x="0" y="2">locked envelope, reminders,</tspan><tspan x="0" y="22">audit trail, no legal drafting</tspan></text>
+  </g>
+  <g transform="translate(575 555)">
+    <rect class="note orange" x="-116" y="-48" width="232" height="96" rx="4"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-12">Chase loop produces</tspan><tspan x="0" y="8">signed, negotiated, refused,</tspan><tspan x="0" y="28">or counsel-routed accounts</tspan></text>
+  </g>
+  <g transform="translate(410 735)">
+    <polygon class="diamond gray" points="0,-78 92,0 0,78 -92,0"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-14">Useful and proven?</tspan><tspan x="0" y="6">Then harden.</tspan><tspan x="0" y="26">Otherwise stop.</tspan></text>
+  </g>
+  <g transform="translate(410 860)">
+    <rect class="note white" x="-118" y="-34" width="236" height="68" rx="4"/>
+    <text class="txt" text-anchor="middle"><tspan x="0" y="-8">Ship: the lawyer owns</tspan><tspan x="0" y="12">the output and evidence</tspan></text>
+  </g>
+</svg>
