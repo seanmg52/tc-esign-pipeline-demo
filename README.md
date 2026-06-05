@@ -35,12 +35,18 @@ npm run build
 npm run dev
 ```
 
-## Core Idea
+## Application Pipeline
 
 ```txt
-Pilot first -> readiness record -> debtor/PPSR gate -> authority gate
--> agreement/e-sign gate -> locked envelope -> chase loop
--> evidence packet / PPSR action / final disposition
+sampleRecords.ts -> evaluateCampaign(records)
+  -> evaluateRecord(record)
+    -> Debtor / PPSR gate
+    -> Authority / Delivery gate
+    -> Agreement / E-sign gate
+    -> chooseDisposition(record, hasGateFlag)
+  -> summary counts by disposition
+  -> React renders summary cards, record cards, and pipeline SVG
+  -> GitHub Actions runs tests/build and deploys dist/ to Pages
 ```
 
 ## Tech Stack

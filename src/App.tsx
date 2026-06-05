@@ -44,8 +44,9 @@ export function App() {
           <p className="eyebrow">Judgment before plumbing</p>
           <h2 id="diagram-title">Pipeline diagram</h2>
           <p>
-            The yellow zone is the owned workflow: data model, gates, and human exceptions. The orange path
-            is where a narrow tool is allowed to do commodity work. The gray diamond is the hardening gate.
+            This is the application pipeline: synthetic readiness records enter the deterministic evaluator,
+            each gate produces findings, disposition logic classifies every account, and React renders the
+            summary cards, record cards, and this diagram.
           </p>
         </div>
         <PipelineDiagram />
@@ -126,11 +127,11 @@ function RecordCard({ record }: { record: EvaluatedRecord }) {
 
 function PipelineDiagram() {
   return (
-    <svg className="pipelineSvg" viewBox="0 0 820 900" role="img" aria-labelledby="pipeline-title pipeline-desc">
-      <title id="pipeline-title">Judgment-led e-sign remediation pipeline</title>
+    <svg className="pipelineSvg" viewBox="0 0 1040 760" role="img" aria-labelledby="pipeline-title pipeline-desc">
+      <title id="pipeline-title">Application pipeline for the T&C e-sign demo</title>
       <desc id="pipeline-desc">
-        A flow chart beginning with judgment, moving through a pilot and owned verification gates, then through
-        narrow e-sign tooling, evidence packets, and hardening.
+        A flow chart showing synthetic readiness records flowing through evaluateCampaign, three gates,
+        disposition classification, summary aggregation, and React rendering.
       </desc>
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -138,92 +139,131 @@ function PipelineDiagram() {
         </marker>
       </defs>
 
-      <path className="flow" d="M410 96 C230 120 190 235 255 330" />
-      <path className="flow" d="M410 96 C600 130 645 230 585 335" />
-      <path className="flow" d="M235 430 C150 535 185 665 330 720" />
-      <path className="flow" d="M590 430 C680 555 630 700 470 735" />
-      <path className="flow" d="M410 775 C410 820 410 840 410 862" />
-      <path className="flow thin" d="M680 78 C760 210 760 610 510 785" />
+      <rect className="ownedZone" x="32" y="160" width="976" height="376" rx="10" />
+      <text className="zoneLabel" x="56" y="194">runtime data pipeline inside this demo app</text>
 
-      <rect className="ownedZone" x="95" y="270" width="350" height="360" rx="8" />
-      <text className="zoneLabel" x="120" y="300">owned workflow: small, portable, inspectable</text>
+      <path className="flow" d="M145 300 C205 300 220 300 270 300" />
+      <path className="flow" d="M430 300 C484 300 502 250 548 250" />
+      <path className="flow" d="M430 300 C484 300 502 300 548 300" />
+      <path className="flow" d="M430 300 C484 300 502 350 548 350" />
+      <path className="flow" d="M680 250 C720 250 730 286 760 320" />
+      <path className="flow" d="M680 300 C724 300 730 308 760 330" />
+      <path className="flow" d="M680 350 C720 350 730 344 760 340" />
+      <path className="flow" d="M860 330 C910 330 920 270 944 240" />
+      <path className="flow" d="M860 330 C920 330 930 330 944 330" />
+      <path className="flow" d="M860 330 C910 330 920 390 944 422" />
+      <path className="flow thin" d="M360 470 C490 620 665 620 800 470" />
+      <path className="flow thin" d="M225 620 C370 690 640 690 820 620" />
 
-      <g transform="translate(410 90)">
-        <polygon className="judgment" points="0,-78 90,0 0,78 -90,0" />
-        <text className="nodeText light" textAnchor="middle">
-          <tspan x="0" y="-16">JUDGMENT decides</tspan>
-          <tspan x="0" y="4">what should be built</tspan>
-          <tspan x="0" y="24">and what should not</tspan>
+      <g transform="translate(130 300)">
+        <rect className="note blue" x="-108" y="-64" width="216" height="128" rx="8" />
+        <text className="nodeText" textAnchor="middle">
+          <tspan x="0" y="-28">sampleRecords.ts</tspan>
+          <tspan x="0" y="-6">synthetic readiness</tspan>
+          <tspan x="0" y="14">records only</tspan>
+          <tspan x="0" y="36">no live integrations</tspan>
         </text>
       </g>
 
-      <g transform="translate(680 70)">
-        <rect className="note blue" x="-88" y="-34" width="176" height="68" rx="4" />
+      <g transform="translate(350 300)">
+        <rect className="note green" x="-96" y="-58" width="192" height="116" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">Start from a real problem,</tspan>
-          <tspan x="0" y="12">not the plumbing</tspan>
+          <tspan x="0" y="-22">evaluateCampaign()</tspan>
+          <tspan x="0" y="0">maps each record</tspan>
+          <tspan x="0" y="20">through evaluateRecord()</tspan>
+          <tspan x="0" y="40">then counts summary</tspan>
         </text>
       </g>
 
-      <g transform="translate(250 210)">
-        <polygon className="diamond lavender" points="0,-72 82,0 0,72 -82,0" />
+      <g transform="translate(610 250)">
+        <rect className="note white" x="-92" y="-36" width="184" height="72" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-12">Pilot 25-40 accounts.</tspan>
-          <tspan x="0" y="8">Is automation worth it?</tspan>
-          <tspan x="0" y="28">Measure exception rate.</tspan>
+          <tspan x="0" y="-8">Debtor / PPSR gate</tspan>
+          <tspan x="0" y="14">entity + PPSR match</tspan>
         </text>
       </g>
 
-      <g transform="translate(250 400)">
-        <polygon className="diamond lavender" points="0,-62 75,0 0,62 -75,0" />
+      <g transform="translate(610 300)">
+        <rect className="note white" x="-92" y="-36" width="184" height="72" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-10">Gate A/B/C:</tspan>
-          <tspan x="0" y="10">debtor, authority,</tspan>
-          <tspan x="0" y="30">content + e-sign</tspan>
+          <tspan x="0" y="-8">Authority gate</tspan>
+          <tspan x="0" y="14">signer + delivery proof</tspan>
         </text>
       </g>
 
-      <g transform="translate(220 555)">
-        <rect className="note green" x="-102" y="-42" width="204" height="84" rx="4" />
+      <g transform="translate(610 350)">
+        <rect className="note white" x="-92" y="-36" width="184" height="72" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-12">Own the readiness record,</tspan>
-          <tspan x="0" y="8">exceptions, and evidence.</tspan>
-          <tspan x="0" y="28">Not the platform.</tspan>
+          <tspan x="0" y="-8">Agreement gate</tspan>
+          <tspan x="0" y="14">terms + e-sign path</tspan>
         </text>
       </g>
 
-      <g transform="translate(575 380)">
-        <rect className="note orange" x="-112" y="-54" width="224" height="108" rx="4" />
+      <g transform="translate(815 330)">
+        <polygon className="diamond lavender" points="0,-82 96,0 0,82 -96,0" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-18">Only now use a narrow tool:</tspan>
-          <tspan x="0" y="2">locked envelope, reminders,</tspan>
-          <tspan x="0" y="22">audit trail, no legal drafting</tspan>
+          <tspan x="0" y="-28">chooseDisposition()</tspan>
+          <tspan x="0" y="-6">gate flag?</tspan>
+          <tspan x="0" y="14">customer response?</tspan>
+          <tspan x="0" y="34">final state</tspan>
         </text>
       </g>
 
-      <g transform="translate(575 555)">
-        <rect className="note orange" x="-116" y="-48" width="232" height="96" rx="4" />
+      <g transform="translate(945 240)">
+        <rect className="note orange" x="-82" y="-38" width="164" height="76" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-12">Chase loop produces</tspan>
-          <tspan x="0" y="8">signed, negotiated, refused,</tspan>
-          <tspan x="0" y="28">or counsel-routed accounts</tspan>
+          <tspan x="0" y="-8">summary cards</tspan>
+          <tspan x="0" y="14">counts by disposition</tspan>
         </text>
       </g>
 
-      <g transform="translate(410 735)">
-        <polygon className="diamond gray" points="0,-78 92,0 0,78 -92,0" />
+      <g transform="translate(945 330)">
+        <rect className="note orange" x="-82" y="-38" width="164" height="76" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-14">Useful and proven?</tspan>
-          <tspan x="0" y="6">Then harden.</tspan>
-          <tspan x="0" y="26">Otherwise stop.</tspan>
+          <tspan x="0" y="-8">record cards</tspan>
+          <tspan x="0" y="14">gates + findings</tspan>
         </text>
       </g>
 
-      <g transform="translate(410 860)">
-        <rect className="note white" x="-118" y="-34" width="236" height="68" rx="4" />
+      <g transform="translate(945 422)">
+        <rect className="note orange" x="-82" y="-38" width="164" height="76" rx="8" />
         <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">Ship: the lawyer owns</tspan>
-          <tspan x="0" y="12">the output and evidence</tspan>
+          <tspan x="0" y="-8">pipeline SVG</tspan>
+          <tspan x="0" y="14">this visual layer</tspan>
+        </text>
+      </g>
+
+      <g transform="translate(360 470)">
+        <rect className="note gray" x="-116" y="-34" width="232" height="68" rx="8" />
+        <text className="nodeText" textAnchor="middle">
+          <tspan x="0" y="-8">pipeline.test.ts</tspan>
+          <tspan x="0" y="12">verifies evaluator behavior</tspan>
+        </text>
+      </g>
+
+      <g transform="translate(800 470)">
+        <rect className="note gray" x="-116" y="-34" width="232" height="68" rx="8" />
+        <text className="nodeText" textAnchor="middle">
+          <tspan x="0" y="-8">React render</tspan>
+          <tspan x="0" y="12">App.tsx + styles.css</tspan>
+        </text>
+      </g>
+
+      <g transform="translate(225 620)">
+        <rect className="note blue" x="-116" y="-42" width="232" height="84" rx="8" />
+        <text className="nodeText" textAnchor="middle">
+          <tspan x="0" y="-14">GitHub push</tspan>
+          <tspan x="0" y="8">deploy.yml runs npm ci,</tspan>
+          <tspan x="0" y="30">tests, build</tspan>
+        </text>
+      </g>
+
+      <g transform="translate(820 620)">
+        <rect className="note green" x="-116" y="-42" width="232" height="84" rx="8" />
+        <text className="nodeText" textAnchor="middle">
+          <tspan x="0" y="-14">GitHub Pages</tspan>
+          <tspan x="0" y="8">serves dist/ at the</tspan>
+          <tspan x="0" y="30">public demo URL</tspan>
         </text>
       </g>
     </svg>
