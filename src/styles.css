@@ -109,89 +109,260 @@ h3 {
 
 .diagramPanel {
   display: grid;
-  grid-template-columns: minmax(240px, 0.75fr) minmax(300px, 1.25fr);
-  gap: 22px;
+  grid-template-columns: minmax(240px, 0.55fr) minmax(520px, 1.45fr);
+  gap: 28px;
   align-items: start;
 }
 
-.pipelineSvg {
-  width: 100%;
-  height: auto;
-  border-radius: 18px;
+.pipelineCanvas {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 28px;
+  padding: 18px;
   background:
-    radial-gradient(circle at 35% 20%, rgba(255, 255, 255, 0.9), transparent 28%),
-    #fbf8ef;
+    radial-gradient(circle at 18% 12%, rgba(45, 212, 191, 0.26), transparent 28%),
+    radial-gradient(circle at 72% 8%, rgba(129, 140, 248, 0.26), transparent 30%),
+    linear-gradient(135deg, #0f172a 0%, #111827 52%, #1e1b4b 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 24px 70px rgba(15, 23, 42, 0.32);
 }
 
-.flow {
-  fill: none;
-  stroke: #3c4353;
-  stroke-linecap: round;
-  stroke-width: 2;
-  marker-end: url("#arrow");
-  opacity: 0.72;
+.pipelineCanvas::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
+  pointer-events: none;
 }
 
-.flow.thin {
-  stroke-width: 1.5;
-  opacity: 0.45;
+.pipelineChrome,
+.pipelineGrid,
+.deployRail {
+  position: relative;
+  z-index: 1;
 }
 
-.ownedZone {
-  fill: rgba(251, 244, 159, 0.42);
-  stroke: rgba(167, 152, 55, 0.45);
+.pipelineChrome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 10px 12px;
+  background: rgba(15, 23, 42, 0.62);
+  color: #cbd5e1;
+  font-size: 0.82rem;
 }
 
-.zoneLabel {
-  fill: #716823;
-  font-size: 15px;
+.chromeDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 999px;
+}
+
+.chromeDot.red {
+  background: #fb7185;
+}
+
+.chromeDot.yellow {
+  background: #facc15;
+}
+
+.chromeDot.green {
+  background: #34d399;
+}
+
+.chromeTitle {
+  color: #e2e8f0;
   font-weight: 800;
 }
 
-.judgment {
-  fill: #111827;
-  stroke: #f2a93b;
-  stroke-width: 4;
+.chromeStatus {
+  border: 1px solid rgba(45, 212, 191, 0.3);
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(20, 184, 166, 0.1);
+  color: #99f6e4;
+  font-weight: 800;
 }
 
-.diamond,
-.note {
-  stroke: rgba(31, 41, 55, 0.18);
-  stroke-width: 2;
+.pipelineGrid {
+  display: grid;
+  grid-template-columns: 1fr 54px 1.05fr 54px 1.2fr 54px 1.05fr 54px 1.1fr;
+  gap: 0;
+  align-items: center;
+  min-height: 390px;
+  padding: 30px 4px 22px;
 }
 
-.lavender {
-  fill: #ddd9fb;
+.pipelineNode {
+  min-width: 0;
+  border: 1px solid rgba(226, 232, 240, 0.14);
+  border-radius: 22px;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.055)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 20px 50px rgba(0, 0, 0, 0.25);
+  color: #f8fafc;
 }
 
-.gray {
-  fill: #e7e7e7;
+.pipelineNode strong {
+  display: block;
+  margin: 6px 0 8px;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
 }
 
-.blue {
-  fill: #e6edff;
+.pipelineNode p {
+  margin-bottom: 0;
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  line-height: 1.45;
 }
 
-.green {
-  fill: #bde7d4;
+.pipelineCanvas .pipelineNode p {
+  color: #cbd5e1;
 }
 
-.orange {
-  fill: #ffd7bf;
+.pipelineNode.source {
+  border-color: rgba(96, 165, 250, 0.32);
 }
 
-.white {
-  fill: #f7f7f7;
+.pipelineNode.compute,
+.pipelineNode.deploy {
+  border-color: rgba(45, 212, 191, 0.34);
 }
 
-.nodeText {
-  fill: #172033;
-  font-size: 15px;
-  font-weight: 700;
+.pipelineNode.gate {
+  border-color: rgba(226, 232, 240, 0.2);
+  padding: 13px;
 }
 
-.nodeText.light {
-  fill: #ffffff;
+.pipelineNode.router {
+  border-color: rgba(167, 139, 250, 0.42);
+  background:
+    linear-gradient(180deg, rgba(139, 92, 246, 0.22), rgba(255, 255, 255, 0.06)),
+    rgba(15, 23, 42, 0.82);
+}
+
+.pipelineNode.output {
+  border-color: rgba(251, 146, 60, 0.42);
+}
+
+.pipelineNode.test {
+  border-color: rgba(148, 163, 184, 0.35);
+}
+
+.nodeEyebrow {
+  color: #94a3b8;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nodeMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.nodeMeta span {
+  border: 1px solid rgba(226, 232, 240, 0.12);
+  border-radius: 999px;
+  padding: 4px 7px;
+  background: rgba(255, 255, 255, 0.07);
+  color: #e2e8f0;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.gateStack,
+.outputStack {
+  display: grid;
+  gap: 10px;
+}
+
+.connector {
+  position: relative;
+  min-height: 2px;
+}
+
+.connector::before {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  left: 6px;
+  height: 2px;
+  content: "";
+  background: linear-gradient(90deg, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.9));
+}
+
+.connector::after {
+  position: absolute;
+  top: calc(50% - 5px);
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  content: "";
+  border-top: 2px solid rgba(45, 212, 191, 0.95);
+  border-right: 2px solid rgba(45, 212, 191, 0.95);
+  transform: rotate(45deg);
+}
+
+.connector span {
+  position: absolute;
+  top: calc(50% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  color: #5eead4;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.deployRail {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
+  align-items: center;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 22px;
+  margin-top: 8px;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.48);
+}
+
+.railLine {
+  height: 2px;
+  margin: 0 14px;
+  background: linear-gradient(90deg, rgba(129, 140, 248, 0.2), rgba(129, 140, 248, 0.95));
+}
+
+.railLine::after {
+  display: block;
+  float: right;
+  width: 10px;
+  height: 10px;
+  margin-top: -4px;
+  content: "";
+  border-top: 2px solid rgba(129, 140, 248, 0.95);
+  border-right: 2px solid rgba(129, 140, 248, 0.95);
+  transform: rotate(45deg);
 }
 
 .summaryGrid {
@@ -354,6 +525,56 @@ dd {
   .diagramPanel,
   .recordGrid {
     grid-template-columns: 1fr;
+  }
+
+  .pipelineGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .connector {
+    min-height: 34px;
+  }
+
+  .connector::before {
+    top: 6px;
+    bottom: 6px;
+    left: 50%;
+    width: 2px;
+    height: auto;
+    background: linear-gradient(180deg, rgba(45, 212, 191, 0.18), rgba(45, 212, 191, 0.9));
+  }
+
+  .connector::after {
+    top: auto;
+    right: calc(50% - 5px);
+    bottom: 5px;
+    transform: rotate(135deg);
+  }
+
+  .connector span {
+    top: 50%;
+    left: calc(50% + 24px);
+    transform: translateY(-50%);
+  }
+
+  .deployRail {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .railLine {
+    width: 2px;
+    height: 38px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, rgba(129, 140, 248, 0.2), rgba(129, 140, 248, 0.95));
+  }
+
+  .railLine::after {
+    float: none;
+    margin-top: 28px;
+    margin-left: -4px;
+    transform: rotate(135deg);
   }
 
   .summaryGrid {

@@ -1,40 +1,111 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 760" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
   <title id="title">Application pipeline for the T&amp;C e-sign demo</title>
-  <desc id="desc">A hand-drawn-style flow chart showing synthetic readiness records flowing through evaluateCampaign, three gates, disposition classification, summary aggregation, and React rendering.</desc>
+  <desc id="desc">A polished dark-canvas pipeline diagram showing synthetic records entering a deterministic evaluator, flowing through three gates, routing to dispositions, rendering UI outputs, and deploying through GitHub Pages.</desc>
   <defs>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3c4353"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f172a"/>
+      <stop offset="0.55" stop-color="#111827"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="18%" cy="12%" r="38%">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="75%" cy="8%" r="36%">
+      <stop offset="0" stop-color="#818cf8" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#818cf8" stop-opacity="0"/>
+    </radialGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#5eead4"/>
     </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
     <style>
-      .bg{fill:#fbf8ef}.flow{fill:none;stroke:#3c4353;stroke-linecap:round;stroke-width:2;marker-end:url(#arrow);opacity:.72}.thin{stroke-width:1.5;opacity:.45}.owned{fill:rgba(251,244,159,.42);stroke:rgba(167,152,55,.45)}.diamond,.note{stroke:rgba(31,41,55,.18);stroke-width:2}.lav{fill:#ddd9fb}.gray{fill:#e7e7e7}.blue{fill:#e6edff}.green{fill:#bde7d4}.orange{fill:#ffd7bf}.white{fill:#f7f7f7}.txt{fill:#172033;font:700 15px Inter,Arial,sans-serif}.zone{fill:#716823;font:800 15px Inter,Arial,sans-serif}
+      .canvas{fill:url(#bg)}.glowA{fill:url(#glowA)}.glowB{fill:url(#glowB)}.grid{stroke:rgba(255,255,255,.05);stroke-width:1}.chrome{fill:rgba(15,23,42,.72);stroke:rgba(148,163,184,.22);stroke-width:1}.dotR{fill:#fb7185}.dotY{fill:#facc15}.dotG{fill:#34d399}.muted{fill:#94a3b8;font:800 13px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.title{fill:#f8fafc;font:800 18px Inter,Arial,sans-serif}.body{fill:#cbd5e1;font:600 13px Inter,Arial,sans-serif}.pillText{fill:#e2e8f0;font:800 11px Inter,Arial,sans-serif}.node{fill:rgba(15,23,42,.78);stroke:rgba(226,232,240,.16);stroke-width:1.2;filter:url(#shadow)}.source{stroke:#60a5fa;stroke-opacity:.44}.compute,.deploy{stroke:#2dd4bf;stroke-opacity:.5}.gate{stroke:#e2e8f0;stroke-opacity:.24}.router{fill:rgba(76,29,149,.48);stroke:#a78bfa;stroke-opacity:.58}.output{stroke:#fb923c;stroke-opacity:.58}.test{stroke:#94a3b8;stroke-opacity:.44}.edge{fill:none;stroke:#5eead4;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.86}.edge2{fill:none;stroke:#818cf8;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.8}.small{fill:#99f6e4;font:800 11px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.rail{fill:rgba(15,23,42,.55);stroke:rgba(148,163,184,.16);stroke-width:1}
     </style>
   </defs>
-  <rect class="bg" width="1040" height="760"/>
-  <rect class="owned" x="32" y="160" width="976" height="376" rx="10"/>
-  <text class="zone" x="56" y="194">runtime data pipeline inside this demo app</text>
-  <path class="flow" d="M145 300 C205 300 220 300 270 300"/>
-  <path class="flow" d="M430 300 C484 300 502 250 548 250"/>
-  <path class="flow" d="M430 300 C484 300 502 300 548 300"/>
-  <path class="flow" d="M430 300 C484 300 502 350 548 350"/>
-  <path class="flow" d="M680 250 C720 250 730 286 760 320"/>
-  <path class="flow" d="M680 300 C724 300 730 308 760 330"/>
-  <path class="flow" d="M680 350 C720 350 730 344 760 340"/>
-  <path class="flow" d="M860 330 C910 330 920 270 944 240"/>
-  <path class="flow" d="M860 330 C920 330 930 330 944 330"/>
-  <path class="flow" d="M860 330 C910 330 920 390 944 422"/>
-  <path class="flow thin" d="M360 470 C490 620 665 620 800 470"/>
-  <path class="flow thin" d="M225 620 C370 690 640 690 820 620"/>
-  <g transform="translate(130 300)"><rect class="note blue" x="-108" y="-64" width="216" height="128" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-28">sampleRecords.ts</tspan><tspan x="0" y="-6">synthetic readiness</tspan><tspan x="0" y="14">records only</tspan><tspan x="0" y="36">no live integrations</tspan></text></g>
-  <g transform="translate(350 300)"><rect class="note green" x="-96" y="-58" width="192" height="116" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-22">evaluateCampaign()</tspan><tspan x="0" y="0">maps each record</tspan><tspan x="0" y="20">through evaluateRecord()</tspan><tspan x="0" y="40">then counts summary</tspan></text></g>
-  <g transform="translate(610 250)"><rect class="note white" x="-92" y="-36" width="184" height="72" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">Debtor / PPSR gate</tspan><tspan x="0" y="14">entity + PPSR match</tspan></text></g>
-  <g transform="translate(610 300)"><rect class="note white" x="-92" y="-36" width="184" height="72" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">Authority gate</tspan><tspan x="0" y="14">signer + delivery proof</tspan></text></g>
-  <g transform="translate(610 350)"><rect class="note white" x="-92" y="-36" width="184" height="72" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">Agreement gate</tspan><tspan x="0" y="14">terms + e-sign path</tspan></text></g>
-  <g transform="translate(815 330)"><polygon class="diamond lav" points="0,-82 96,0 0,82 -96,0"/><text class="txt" text-anchor="middle"><tspan x="0" y="-28">chooseDisposition()</tspan><tspan x="0" y="-6">gate flag?</tspan><tspan x="0" y="14">customer response?</tspan><tspan x="0" y="34">final state</tspan></text></g>
-  <g transform="translate(945 240)"><rect class="note orange" x="-82" y="-38" width="164" height="76" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">summary cards</tspan><tspan x="0" y="14">counts by disposition</tspan></text></g>
-  <g transform="translate(945 330)"><rect class="note orange" x="-82" y="-38" width="164" height="76" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">record cards</tspan><tspan x="0" y="14">gates + findings</tspan></text></g>
-  <g transform="translate(945 422)"><rect class="note orange" x="-82" y="-38" width="164" height="76" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">pipeline SVG</tspan><tspan x="0" y="14">this visual layer</tspan></text></g>
-  <g transform="translate(360 470)"><rect class="note gray" x="-116" y="-34" width="232" height="68" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">pipeline.test.ts</tspan><tspan x="0" y="12">verifies evaluator behavior</tspan></text></g>
-  <g transform="translate(800 470)"><rect class="note gray" x="-116" y="-34" width="232" height="68" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-8">React render</tspan><tspan x="0" y="12">App.tsx + styles.css</tspan></text></g>
-  <g transform="translate(225 620)"><rect class="note blue" x="-116" y="-42" width="232" height="84" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-14">GitHub push</tspan><tspan x="0" y="8">deploy.yml runs npm ci,</tspan><tspan x="0" y="30">tests, build</tspan></text></g>
-  <g transform="translate(820 620)"><rect class="note green" x="-116" y="-42" width="232" height="84" rx="8"/><text class="txt" text-anchor="middle"><tspan x="0" y="-14">GitHub Pages</tspan><tspan x="0" y="8">serves dist/ at the</tspan><tspan x="0" y="30">public demo URL</tspan></text></g>
+  <rect class="canvas" width="1280" height="720" rx="32"/>
+  <rect class="glowA" width="1280" height="720" rx="32"/>
+  <rect class="glowB" width="1280" height="720" rx="32"/>
+  <path class="grid" d="M80 0V720M160 0V720M240 0V720M320 0V720M400 0V720M480 0V720M560 0V720M640 0V720M720 0V720M800 0V720M880 0V720M960 0V720M1040 0V720M1120 0V720M1200 0V720M0 80H1280M0 160H1280M0 240H1280M0 320H1280M0 400H1280M0 480H1280M0 560H1280M0 640H1280"/>
+  <rect class="chrome" x="42" y="34" width="1196" height="54" rx="18"/>
+  <circle class="dotR" cx="70" cy="61" r="6"/><circle class="dotY" cx="91" cy="61" r="6"/><circle class="dotG" cx="112" cy="61" r="6"/>
+  <text class="title" x="150" y="67">tc-esign-pipeline-demo / runtime graph</text>
+  <text class="small" x="1085" y="66">5 synthetic records</text>
+
+  <path class="edge" d="M206 304H285"/>
+  <path class="edge" d="M440 304C500 304 500 214 565 214"/>
+  <path class="edge" d="M440 304H565"/>
+  <path class="edge" d="M440 304C500 304 500 394 565 394"/>
+  <path class="edge" d="M746 214C790 214 806 292 850 302"/>
+  <path class="edge" d="M746 304H850"/>
+  <path class="edge" d="M746 394C790 394 806 316 850 306"/>
+  <path class="edge" d="M1004 304C1040 304 1044 252 1082 238"/>
+  <path class="edge" d="M1004 304H1082"/>
+  <path class="edge" d="M1004 304C1040 304 1044 356 1082 370"/>
+  <path class="edge2" d="M304 560H510"/>
+  <path class="edge2" d="M770 560H978"/>
+
+  <g transform="translate(72 224)">
+    <rect class="node source" width="170" height="160" rx="22"/>
+    <text class="muted" x="20" y="32">Input</text>
+    <text class="title" x="20" y="62">sampleRecords.ts</text>
+    <text class="body" x="20" y="92">Synthetic readiness</text>
+    <text class="body" x="20" y="113">records only.</text>
+    <text class="body" x="20" y="134">No live integrations.</text>
+  </g>
+  <g transform="translate(285 232)">
+    <rect class="node compute" width="190" height="144" rx="22"/>
+    <text class="muted" x="20" y="32">Evaluator</text>
+    <text class="title" x="20" y="62">evaluateCampaign()</text>
+    <text class="body" x="20" y="92">Maps each account</text>
+    <text class="body" x="20" y="113">through gates, then</text>
+    <text class="body" x="20" y="134">counts dispositions.</text>
+  </g>
+  <g transform="translate(565 174)">
+    <rect class="node gate" width="210" height="80" rx="18"/>
+    <text class="muted" x="18" y="29">Gate A</text><text class="title" x="18" y="55">Debtor / PPSR</text>
+  </g>
+  <g transform="translate(565 264)">
+    <rect class="node gate" width="210" height="80" rx="18"/>
+    <text class="muted" x="18" y="29">Gate B</text><text class="title" x="18" y="55">Authority / Delivery</text>
+  </g>
+  <g transform="translate(565 354)">
+    <rect class="node gate" width="210" height="80" rx="18"/>
+    <text class="muted" x="18" y="29">Gate C</text><text class="title" x="18" y="55">Agreement / E-sign</text>
+  </g>
+  <g transform="translate(850 224)">
+    <rect class="node router" width="190" height="160" rx="24"/>
+    <text class="muted" x="20" y="32">Router</text>
+    <text class="title" x="20" y="62">chooseDisposition()</text>
+    <text class="body" x="20" y="92">Gate flag?</text>
+    <text class="body" x="20" y="113">Customer response?</text>
+    <text class="body" x="20" y="134">Final state.</text>
+  </g>
+  <g transform="translate(1082 194)">
+    <rect class="node output" width="166" height="88" rx="18"/>
+    <text class="muted" x="18" y="29">UI output</text><text class="title" x="18" y="56">Summary cards</text>
+  </g>
+  <g transform="translate(1082 304)">
+    <rect class="node output" width="166" height="88" rx="18"/>
+    <text class="muted" x="18" y="29">UI output</text><text class="title" x="18" y="56">Record cards</text>
+  </g>
+  <g transform="translate(1082 414)">
+    <rect class="node output" width="166" height="88" rx="18"/>
+    <text class="muted" x="18" y="29">UI output</text><text class="title" x="18" y="56">Pipeline view</text>
+  </g>
+  <rect class="rail" x="72" y="500" width="1136" height="124" rx="24"/>
+  <g transform="translate(104 526)">
+    <rect class="node test" width="220" height="72" rx="18"/>
+    <text class="muted" x="18" y="28">Verification</text><text class="title" x="18" y="54">Vitest + Vite build</text>
+  </g>
+  <g transform="translate(510 526)">
+    <rect class="node compute" width="260" height="72" rx="18"/>
+    <text class="muted" x="18" y="28">GitHub Actions</text><text class="title" x="18" y="54">npm ci ’ test ’ build</text>
+  </g>
+  <g transform="translate(978 526)">
+    <rect class="node deploy" width="200" height="72" rx="18"/>
+    <text class="muted" x="18" y="28">Publish</text><text class="title" x="18" y="54">GitHub Pages</text>
+  </g>
 </svg>

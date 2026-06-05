@@ -41,7 +41,7 @@ export function App() {
 
       <section id="diagram" className="panel diagramPanel" aria-labelledby="diagram-title">
         <div>
-          <p className="eyebrow">Judgment before plumbing</p>
+          <p className="eyebrow">Runtime pipeline</p>
           <h2 id="diagram-title">Pipeline diagram</h2>
           <p>
             This is the application pipeline: synthetic readiness records enter the deterministic evaluator,
@@ -127,145 +127,104 @@ function RecordCard({ record }: { record: EvaluatedRecord }) {
 
 function PipelineDiagram() {
   return (
-    <svg className="pipelineSvg" viewBox="0 0 1040 760" role="img" aria-labelledby="pipeline-title pipeline-desc">
-      <title id="pipeline-title">Application pipeline for the T&C e-sign demo</title>
-      <desc id="pipeline-desc">
-        A flow chart showing synthetic readiness records flowing through evaluateCampaign, three gates,
-        disposition classification, summary aggregation, and React rendering.
-      </desc>
-      <defs>
-        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" />
-        </marker>
-      </defs>
+    <div className="pipelineCanvas" role="img" aria-label="Application pipeline from sample data through deterministic evaluator, rendered UI, tests, build, and GitHub Pages deploy.">
+      <div className="pipelineChrome">
+        <div>
+          <span className="chromeDot red" />
+          <span className="chromeDot yellow" />
+          <span className="chromeDot green" />
+        </div>
+        <span className="chromeTitle">tc-esign-pipeline-demo / runtime graph</span>
+        <span className="chromeStatus">5 synthetic records</span>
+      </div>
 
-      <rect className="ownedZone" x="32" y="160" width="976" height="376" rx="10" />
-      <text className="zoneLabel" x="56" y="194">runtime data pipeline inside this demo app</text>
+      <div className="pipelineGrid">
+        <PipelineNode
+          tone="source"
+          eyebrow="Input"
+          title="sampleRecords.ts"
+          body="Synthetic readiness records. No DocuSign, NZBN, PPSR, customer data, or PII."
+          meta={["ReadinessRecord[]", "fake .example emails", "5 demo accounts"]}
+        />
 
-      <path className="flow" d="M145 300 C205 300 220 300 270 300" />
-      <path className="flow" d="M430 300 C484 300 502 250 548 250" />
-      <path className="flow" d="M430 300 C484 300 502 300 548 300" />
-      <path className="flow" d="M430 300 C484 300 502 350 548 350" />
-      <path className="flow" d="M680 250 C720 250 730 286 760 320" />
-      <path className="flow" d="M680 300 C724 300 730 308 760 330" />
-      <path className="flow" d="M680 350 C720 350 730 344 760 340" />
-      <path className="flow" d="M860 330 C910 330 920 270 944 240" />
-      <path className="flow" d="M860 330 C920 330 930 330 944 330" />
-      <path className="flow" d="M860 330 C910 330 920 390 944 422" />
-      <path className="flow thin" d="M360 470 C490 620 665 620 800 470" />
-      <path className="flow thin" d="M225 620 C370 690 640 690 820 620" />
+        <Connector label="records" />
 
-      <g transform="translate(130 300)">
-        <rect className="note blue" x="-108" y="-64" width="216" height="128" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-28">sampleRecords.ts</tspan>
-          <tspan x="0" y="-6">synthetic readiness</tspan>
-          <tspan x="0" y="14">records only</tspan>
-          <tspan x="0" y="36">no live integrations</tspan>
-        </text>
-      </g>
+        <PipelineNode
+          tone="compute"
+          eyebrow="Evaluator"
+          title="evaluateCampaign()"
+          body="Maps each account through deterministic gates, then aggregates disposition counts."
+          meta={["evaluateRecord()", "summary reducer", "pure TypeScript"]}
+        />
 
-      <g transform="translate(350 300)">
-        <rect className="note green" x="-96" y="-58" width="192" height="116" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-22">evaluateCampaign()</tspan>
-          <tspan x="0" y="0">maps each record</tspan>
-          <tspan x="0" y="20">through evaluateRecord()</tspan>
-          <tspan x="0" y="40">then counts summary</tspan>
-        </text>
-      </g>
+        <Connector label="fan out" />
 
-      <g transform="translate(610 250)">
-        <rect className="note white" x="-92" y="-36" width="184" height="72" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">Debtor / PPSR gate</tspan>
-          <tspan x="0" y="14">entity + PPSR match</tspan>
-        </text>
-      </g>
+        <div className="gateStack" aria-label="Three deterministic gates">
+          <PipelineNode tone="gate" eyebrow="Gate A" title="Debtor / PPSR" body="Checks entity status, NZBN presence, and PPSR debtor match." />
+          <PipelineNode tone="gate" eyebrow="Gate B" title="Authority / Delivery" body="Checks signer, authority evidence, delivery email, and exposure-sensitive proof." />
+          <PipelineNode tone="gate" eyebrow="Gate C" title="Agreement / E-sign" body="Checks template version, collateral clause, coverage, and e-sign eligibility." />
+        </div>
 
-      <g transform="translate(610 300)">
-        <rect className="note white" x="-92" y="-36" width="184" height="72" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">Authority gate</tspan>
-          <tspan x="0" y="14">signer + delivery proof</tspan>
-        </text>
-      </g>
+        <Connector label="findings" />
 
-      <g transform="translate(610 350)">
-        <rect className="note white" x="-92" y="-36" width="184" height="72" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">Agreement gate</tspan>
-          <tspan x="0" y="14">terms + e-sign path</tspan>
-        </text>
-      </g>
+        <PipelineNode
+          tone="router"
+          eyebrow="Router"
+          title="chooseDisposition()"
+          body="Combines gate status with customer response to classify the account."
+          meta={["signed", "human review", "negotiation", "credit-stop", "wet-ink"]}
+        />
 
-      <g transform="translate(815 330)">
-        <polygon className="diamond lavender" points="0,-82 96,0 0,82 -96,0" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-28">chooseDisposition()</tspan>
-          <tspan x="0" y="-6">gate flag?</tspan>
-          <tspan x="0" y="14">customer response?</tspan>
-          <tspan x="0" y="34">final state</tspan>
-        </text>
-      </g>
+        <Connector label="view model" />
 
-      <g transform="translate(945 240)">
-        <rect className="note orange" x="-82" y="-38" width="164" height="76" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">summary cards</tspan>
-          <tspan x="0" y="14">counts by disposition</tspan>
-        </text>
-      </g>
+        <div className="outputStack" aria-label="Rendered outputs">
+          <PipelineNode tone="output" eyebrow="UI output" title="Summary cards" body="Counts every disposition and shows campaign shape at a glance." />
+          <PipelineNode tone="output" eyebrow="UI output" title="Record cards" body="Shows each account, gate status, findings, and final disposition." />
+        </div>
+      </div>
 
-      <g transform="translate(945 330)">
-        <rect className="note orange" x="-82" y="-38" width="164" height="76" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">record cards</tspan>
-          <tspan x="0" y="14">gates + findings</tspan>
-        </text>
-      </g>
+      <div className="deployRail">
+        <PipelineNode tone="test" eyebrow="Verification" title="Vitest + build" body="pipeline.test.ts proves evaluator behavior; Vite builds the static app." />
+        <div className="railLine" />
+        <PipelineNode tone="deploy" eyebrow="Publish" title="GitHub Pages" body="deploy.yml runs npm ci, tests, build, then serves dist/ at the public URL." />
+      </div>
+    </div>
+  );
+}
 
-      <g transform="translate(945 422)">
-        <rect className="note orange" x="-82" y="-38" width="164" height="76" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">pipeline SVG</tspan>
-          <tspan x="0" y="14">this visual layer</tspan>
-        </text>
-      </g>
+function PipelineNode({
+  tone,
+  eyebrow,
+  title,
+  body,
+  meta = []
+}: {
+  tone: "source" | "compute" | "gate" | "router" | "output" | "test" | "deploy";
+  eyebrow: string;
+  title: string;
+  body: string;
+  meta?: string[];
+}) {
+  return (
+    <article className={`pipelineNode ${tone}`}>
+      <span className="nodeEyebrow">{eyebrow}</span>
+      <strong>{title}</strong>
+      <p>{body}</p>
+      {meta.length > 0 && (
+        <div className="nodeMeta">
+          {meta.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      )}
+    </article>
+  );
+}
 
-      <g transform="translate(360 470)">
-        <rect className="note gray" x="-116" y="-34" width="232" height="68" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">pipeline.test.ts</tspan>
-          <tspan x="0" y="12">verifies evaluator behavior</tspan>
-        </text>
-      </g>
-
-      <g transform="translate(800 470)">
-        <rect className="note gray" x="-116" y="-34" width="232" height="68" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-8">React render</tspan>
-          <tspan x="0" y="12">App.tsx + styles.css</tspan>
-        </text>
-      </g>
-
-      <g transform="translate(225 620)">
-        <rect className="note blue" x="-116" y="-42" width="232" height="84" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-14">GitHub push</tspan>
-          <tspan x="0" y="8">deploy.yml runs npm ci,</tspan>
-          <tspan x="0" y="30">tests, build</tspan>
-        </text>
-      </g>
-
-      <g transform="translate(820 620)">
-        <rect className="note green" x="-116" y="-42" width="232" height="84" rx="8" />
-        <text className="nodeText" textAnchor="middle">
-          <tspan x="0" y="-14">GitHub Pages</tspan>
-          <tspan x="0" y="8">serves dist/ at the</tspan>
-          <tspan x="0" y="30">public demo URL</tspan>
-        </text>
-      </g>
-    </svg>
+function Connector({ label }: { label: string }) {
+  return (
+    <div className="connector" aria-hidden="true">
+      <span>{label}</span>
+    </div>
   );
 }
