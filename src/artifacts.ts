@@ -50,7 +50,7 @@ const evidenceManifestHeader = [
 export function generateCampaignArtifacts(records: EvaluatedRecord[]): CampaignArtifacts {
   const sendableRecords = records.filter(isSendableCleanRecord);
   const exceptionRecords = records.filter(isExceptionRecord);
-  const signedRecords = records.filter((record) => record.disposition === "signed-evidenced");
+  const evidencedRecords = records.filter((record) => record.evidenceStatus === "complete");
 
   return {
     termsDrafts: sendableRecords.map(createTermsDraft),
@@ -72,15 +72,15 @@ export function generateCampaignArtifacts(records: EvaluatedRecord[]): CampaignA
     ]),
     evidenceManifestCsv: toCsv([
       evidenceManifestHeader,
-      ...signedRecords.map((record) => [
+      ...evidencedRecords.map((record) => [
         record.customerId,
         record.legalName,
         record.templateVersion,
         record.signerName,
         record.signerEmail,
         record.authorityEvidence,
-        "offline-synthetic-signed",
-        `SYNTHETIC-EVIDENCE-${record.customerId}`
+        record.evidenceStatus,
+        ""
       ])
     ])
   };
@@ -191,7 +191,8 @@ function toCsv(rows: string[][]): string {
 }
 
 function escapeCsvValue(value: string): string {
-  return /[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  const neutralized = /^[=+\-@]/.test(value) ? `'${value}` : value;
+  return /[",\r\n]/.test(neutralized) ? `"${neutralized.replace(/"/g, '""')}"` : neutralized;
 }
 
 function escapeHtml(value: string): string {

@@ -19,6 +19,16 @@ const baseRecord: ReadinessRecord = {
   templateVersion: "tc-v4",
   collateralClauseApproved: true,
   coverage: "future-and-existing",
+  debtorType: "company",
+  incorporationNumber: "1000001",
+  legalNameVerified: true,
+  insolvencyRisk: "low",
+  relatedParty: false,
+  restrictedPeriodIndicator: "none",
+  annualContractValueNzd: 300_000,
+  hasPersonalGuarantee: false,
+  ppsrCorrectionType: "none",
+  securityAgreementStatus: "signed",
   eSignEligible: true,
   customerResponse: "not-sent"
 };
@@ -105,7 +115,7 @@ describe("generateCampaignArtifacts", () => {
     expect(artifacts.exceptionReportCsv).not.toContain("SYN-001");
   });
 
-  it("generates an evidence manifest CSV for signed and evidenced records", () => {
+  it("does not claim evidence exists for an imported signed response", () => {
     const artifacts = artifactsFor([
       baseRecord,
       {
@@ -116,10 +126,22 @@ describe("generateCampaignArtifacts", () => {
     ]);
 
     expect(artifacts.evidenceManifestCsv).toBe(
-      [
-        "customer_id,legal_name,template_version,signer_name,signer_email,authority_evidence,evidence_status,evidence_reference",
-        "SIGNED-002,Kauri Supplies Limited,tc-v4,Aroha Director,aroha.director@kauri.example,director-record,offline-synthetic-signed,SYNTHETIC-EVIDENCE-SIGNED-002"
-      ].join("\n")
+      "customer_id,legal_name,template_version,signer_name,signer_email,authority_evidence,evidence_status,evidence_reference"
     );
+  });
+
+  it("neutralizes spreadsheet formulas in exported CSV cells", () => {
+    const artifacts = artifactsFor([
+      {
+        ...baseRecord,
+        tradingName: "=HYPERLINK(\"https://example.test\")",
+        signerName: "+SUM(1,1)"
+      }
+    ]);
+
+    expect(artifacts.chaseTrackerCsv).toContain(
+      "\"'=HYPERLINK(\"\"https://example.test\"\")\""
+    );
+    expect(artifacts.chaseTrackerCsv).toContain("\"'+SUM(1,1)\"");
   });
 });

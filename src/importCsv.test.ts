@@ -111,4 +111,17 @@ describe("parseReadinessCsv", () => {
       ])
     );
   });
+
+  it("reports the actual boolean column when a required boolean is invalid", () => {
+    const result = parseReadinessCsv(validCsv.replace(",active,true,verified,", ",active,maybe,verified,"));
+
+    expect(result.records).toEqual([]);
+    expect(result.errors).toEqual([
+      expect.objectContaining({
+        row: 2,
+        column: "ppsr_debtor_matches",
+        message: 'Invalid ppsr_debtor_matches "maybe"; expected true or false'
+      })
+    ]);
+  });
 });

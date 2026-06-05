@@ -1,7 +1,21 @@
 import type { ReadinessRecord } from "./pipeline";
 
+const verifiedDefaults = {
+  debtorType: "company",
+  incorporationNumber: "1000000",
+  legalNameVerified: true,
+  insolvencyRisk: "low",
+  relatedParty: false,
+  restrictedPeriodIndicator: "none",
+  annualContractValueNzd: 300_000,
+  hasPersonalGuarantee: false,
+  ppsrCorrectionType: "none",
+  securityAgreementStatus: "signed"
+} as const;
+
 export const sampleRecords: ReadinessRecord[] = [
   {
+    ...verifiedDefaults,
     customerId: "ACME-001",
     tradingName: "Acme Supply",
     legalName: "Acme Supply Limited",
@@ -24,6 +38,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "signed"
   },
   {
+    ...verifiedDefaults,
     customerId: "BOLT-014",
     tradingName: "Bolt Rentals",
     legalName: "Bolt Holdings Limited",
@@ -44,6 +59,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "not-sent"
   },
   {
+    ...verifiedDefaults,
     customerId: "CEDAR-022",
     tradingName: "Cedar Workshop",
     legalName: "Cedar Workshop Limited",
@@ -68,6 +84,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "refused"
   },
   {
+    ...verifiedDefaults,
     customerId: "DELTA-037",
     tradingName: "Delta Freight",
     legalName: "Delta Freight Limited",
@@ -94,6 +111,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "negotiating"
   },
   {
+    ...verifiedDefaults,
     customerId: "ECHO-108",
     tradingName: "Echo Engineering",
     legalName: "Echo Engineering Limited",
@@ -114,6 +132,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "wet-ink"
   },
   {
+    ...verifiedDefaults,
     customerId: "FERN-201",
     tradingName: "Fern Family Trust Trading",
     legalName: "Fern Family Trust",
@@ -135,6 +154,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "not-sent"
   },
   {
+    ...verifiedDefaults,
     customerId: "GULL-305",
     tradingName: "Gull Logistics",
     legalName: "Gull Logistics Limited",
@@ -160,6 +180,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "not-sent"
   },
   {
+    ...verifiedDefaults,
     customerId: "HARB-412",
     tradingName: "Harbour Marine",
     legalName: "Harbour Marine Limited",
@@ -182,6 +203,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "not-sent"
   },
   {
+    ...verifiedDefaults,
     customerId: "IRIS-501",
     tradingName: "Iris Components",
     legalName: "Iris Components Limited",
@@ -206,6 +228,7 @@ export const sampleRecords: ReadinessRecord[] = [
     customerResponse: "not-sent"
   },
   {
+    ...verifiedDefaults,
     customerId: "JADE-602",
     tradingName: "Jade Retail",
     legalName: "Jade Retail Limited",

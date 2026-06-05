@@ -18,17 +18,28 @@ const cleanRecord: ReadinessRecord = {
   templateVersion: "tc-v4",
   collateralClauseApproved: true,
   coverage: "future-and-existing",
+  debtorType: "company",
+  incorporationNumber: "1000001",
+  legalNameVerified: true,
+  insolvencyRisk: "low",
+  relatedParty: false,
+  restrictedPeriodIndicator: "none",
+  annualContractValueNzd: 300_000,
+  hasPersonalGuarantee: false,
+  ppsrCorrectionType: "none",
+  securityAgreementStatus: "signed",
   eSignEligible: true,
   customerResponse: "signed"
 };
 
 describe("evaluateCampaign", () => {
-  it("marks a fully verified signed record as signed and evidenced", () => {
+  it("keeps an imported signed response separate from verified evidence", () => {
     const result = evaluateCampaign([cleanRecord]);
 
-    expect(result.records[0].disposition).toBe("signed-evidenced");
+    expect(result.records[0].disposition).toBe("reported-signed");
+    expect(result.records[0].evidenceStatus).toBe("unverified");
     expect(result.records[0].gates.every((gate) => gate.status === "clear")).toBe(true);
-    expect(result.summary["signed-evidenced"]).toBe(1);
+    expect(result.summary["reported-signed"]).toBe(1);
   });
 
   it("returns structured findings for a PPSR debtor mismatch", () => {
@@ -127,7 +138,7 @@ describe("evaluateCampaign", () => {
     );
   });
 
-  it("auto-sends clean records that have not yet been sent", () => {
+  it("routes clean standard records into the chase state", () => {
     const result = evaluateCampaign([
       {
         ...cleanRecord,
@@ -175,7 +186,7 @@ describe("evaluateCampaign", () => {
     );
   });
 
-  it("routes elevated insolvency with existing-only coverage to future-supply-only via remediation router", () => {
+  it("requires human approval for a Gate D+ remediation recommendation", () => {
     const result = evaluateCampaign([
       {
         ...cleanRecord,
@@ -191,7 +202,7 @@ describe("evaluateCampaign", () => {
 
     const evaluated = result.records[0];
 
-    expect(evaluated.disposition).toBe("in-chase");
+    expect(evaluated.disposition).toBe("human-review");
     expect(evaluated.insolvencyRemediation.path).toBe("future-supply-only");
     expect(evaluated.insolvencyRemediation.templateVariantId).toBe("tc-v4-future-supply-only");
     expect(evaluated.gates).toEqual(
@@ -286,6 +297,28 @@ describe("evaluateCampaign", () => {
     );
   });
 
+  it("clears the guarantee formalities check when a separate guarantor is captured", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "GUAR-OK-012",
+        hasPersonalGuarantee: true,
+        guarantorName: "Jamie Guarantor",
+        guarantorEmail: "jamie.guarantor@example.test",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const guaranteeGate = result.records[0].gates.find((gate) => gate.name === "Gate E - Guarantee / FTA");
+
+    expect(guaranteeGate).toEqual({
+      name: "Gate E - Guarantee / FTA",
+      status: "clear",
+      findings: []
+    });
+    expect(result.records[0].disposition).toBe("in-chase");
+  });
+
   it("flags sub-250k contracts for FTA unfair-terms review", () => {
     const result = evaluateCampaign([
       {
@@ -340,7 +373,10 @@ describe("evaluateCampaign", () => {
           name: "Gate A - Entity / PPSR",
           findings: expect.arrayContaining([
             expect.objectContaining({ code: "ENTITY_STATUS_UNKNOWN" }),
-            expect.objectContaining({ code: "PPSR_DEBTOR_MATCH_UNKNOWN" })
+            expect.objectContaining({ code: "PPSR_DEBTOR_MATCH_UNKNOWN" }),
+            expect.objectContaining({ code: "DEBTOR_TYPE_UNKNOWN" }),
+            expect.objectContaining({ code: "LEGAL_NAME_VERIFICATION_UNKNOWN" }),
+            expect.objectContaining({ code: "INCORPORATION_NUMBER_MISSING" })
           ])
         }),
         expect.objectContaining({
@@ -350,6 +386,20 @@ describe("evaluateCampaign", () => {
         expect.objectContaining({
           name: "Gate C - T&C Package",
           findings: expect.arrayContaining([expect.objectContaining({ code: "COLLATERAL_CLAUSE_APPROVAL_UNKNOWN" })])
+        }),
+        expect.objectContaining({
+          name: "Gate D - Insolvency / Clawback",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "INSOLVENCY_RISK_UNKNOWN" }),
+            expect.objectContaining({ code: "RELATED_PARTY_STATUS_UNKNOWN" })
+          ])
+        }),
+        expect.objectContaining({
+          name: "Gate E - Guarantee / FTA",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "GUARANTEE_STATUS_UNKNOWN" }),
+            expect.objectContaining({ code: "FTA_VALUE_UNKNOWN" })
+          ])
         })
       ])
     );
@@ -367,10 +417,10 @@ describe("evaluateCampaign", () => {
     ]);
 
     expect(result.records.map((record) => record.disposition)).toEqual([
-      "signed-evidenced",
+      "reported-signed",
       "credit-stop-review"
     ]);
-    expect(result.summary["signed-evidenced"]).toBe(1);
+    expect(result.summary["reported-signed"]).toBe(1);
     expect(result.summary["credit-stop-review"]).toBe(1);
   });
 });

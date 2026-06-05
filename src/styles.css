@@ -552,9 +552,228 @@ textarea {
   white-space: nowrap;
 }
 
-.signed-evidenced {
+.reported-signed {
   background: #d9f5df;
 }
+
+.twoLayerDiagram {
+  display: grid;
+  gap: 16px;
+}
+
+.twoLayerDiagram > * {
+  position: relative;
+  z-index: 1;
+}
+
+.diagramLayer {
+  border: 2px solid rgba(71, 85, 105, 0.2);
+  border-radius: 22px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.productionLayer {
+  border-style: dashed;
+  background: rgba(248, 250, 252, 0.7);
+}
+
+.diagramLayerHeader {
+  margin-bottom: 14px;
+}
+
+.diagramLayerHeader > span {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.productionLayer .diagramLayerHeader > span {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+.diagramLayerHeader h3 {
+  margin: 8px 0 5px;
+  font-size: 1rem;
+}
+
+.diagramLayerHeader p,
+.loopNote {
+  margin-bottom: 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.diagramRow {
+  display: grid;
+  grid-template-columns: 116px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  border-top: 1px solid rgba(148, 163, 184, 0.18);
+  padding: 12px 0;
+}
+
+.diagramRow:last-child {
+  padding-bottom: 0;
+}
+
+.diagramRowLabel {
+  padding-top: 8px;
+  color: #64748b;
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.diagramNodeGrid {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.diagramNodeWithArrow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex: 1 1 116px;
+  min-width: 0;
+}
+
+.diagramNode {
+  min-width: 0;
+  height: 100%;
+  flex: 1;
+  border: 1px solid #93a4bd;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fff;
+}
+
+.diagramNode strong {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.8rem;
+}
+
+.diagramNode p {
+  margin-bottom: 0;
+  color: #526078;
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+
+.diagramNode.data {
+  border-color: #60a5fa;
+  background: #eff6ff;
+}
+
+.diagramNode.control {
+  border-color: #8b93e8;
+  background: #eef1ff;
+}
+
+.diagramNode.risk {
+  border-color: #ea8a5b;
+  background: #fff1eb;
+}
+
+.diagramNode.human {
+  border-color: #d8ae3c;
+  background: #fff8df;
+}
+
+.diagramNode.verified {
+  border-color: #58ae8c;
+  background: #eaf8f3;
+}
+
+.diagramNode.proposed {
+  border-style: dashed;
+  border-color: #7c8da8;
+  background: #f8fafc;
+}
+
+.diagramArrow {
+  color: #64748b;
+  font-weight: 900;
+}
+
+.decisionContract {
+  border: 2px solid #5b6fd8;
+  border-radius: 18px;
+  padding: 12px 14px;
+  background: #eef1ff;
+  text-align: center;
+}
+
+.decisionContract strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #303f9f;
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.decisionContract div,
+.diagramLegend {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.decisionContract span {
+  border-radius: 999px;
+  padding: 4px 7px;
+  background: #fff;
+  color: #42516b;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.loopNote {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.diagramLegend {
+  justify-content: flex-start;
+  color: #526078;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.diagramLegend span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.legendSwatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 1px solid #93a4bd;
+  border-radius: 3px;
+}
+
+.legendSwatch.data { background: #eff6ff; border-color: #60a5fa; }
+.legendSwatch.control { background: #eef1ff; border-color: #8b93e8; }
+.legendSwatch.risk { background: #fff1eb; border-color: #ea8a5b; }
+.legendSwatch.human { background: #fff8df; border-color: #d8ae3c; }
+.legendSwatch.verified { background: #eaf8f3; border-color: #58ae8c; }
+.legendSwatch.proposed { background: #f8fafc; border-style: dashed; border-color: #7c8da8; }
 
 .human-review {
   background: #f8e1f2;
@@ -655,6 +874,14 @@ dd {
     gap: 12px;
   }
 
+  .diagramRow {
+    grid-template-columns: 1fr;
+  }
+
+  .diagramRowLabel {
+    padding-top: 0;
+  }
+
   .connector {
     min-height: 34px;
   }
@@ -698,6 +925,14 @@ dd {
   .hero,
   .panel {
     padding: 20px;
+  }
+
+  .diagramNodeWithArrow {
+    flex-basis: 100%;
+  }
+
+  .diagramArrow {
+    transform: rotate(90deg);
   }
 
   .summaryGrid,

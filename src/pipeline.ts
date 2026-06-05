@@ -33,6 +33,7 @@ export type CustomerResponse =
 
 export type GateStatus = "clear" | "flagged";
 export type FindingSeverity = "review" | "blocker";
+export type EvidenceStatus = "unverified" | "complete";
 export type GateName =
   | "Gate A - Entity / PPSR"
   | "Gate B - Signer Authority"
@@ -46,9 +47,13 @@ export type FindingCode =
   | "ENTITY_NOT_ACTIVE"
   | "PPSR_DEBTOR_MATCH_UNKNOWN"
   | "PPSR_DEBTOR_MISMATCH"
+  | "DEBTOR_TYPE_UNKNOWN"
   | "DEBTOR_TYPE_REQUIRES_HUMAN_REVIEW"
+  | "LEGAL_NAME_VERIFICATION_UNKNOWN"
   | "LEGAL_NAME_NOT_VERIFIED"
   | "INCORPORATION_NUMBER_MISSING"
+  | "PPSR_CORRECTION_STATUS_UNKNOWN"
+  | "SECURITY_AGREEMENT_STATUS_UNKNOWN"
   | "PPSR_UNSUPPORTED_REGISTRATION"
   | "PPSR_WRONG_ENTITY_REREGISTER"
   | "SIGNER_MISSING"
@@ -66,11 +71,15 @@ export type FindingCode =
   | "ANTECEDENT_DEBT_CLAWBACK_RISK"
   | "RELATED_PARTY_CHARGE_RISK"
   | "INSOLVENCY_RISK_ELEVATED"
+  | "INSOLVENCY_RISK_UNKNOWN"
+  | "RELATED_PARTY_STATUS_UNKNOWN"
   | "PERSONAL_GUARANTEE_REQUIRES_SEPARATE_SIGNER"
   | "GUARANTOR_MISSING"
-  | "FTA_UNFAIR_TERMS_REVIEW";
+  | "GUARANTEE_STATUS_UNKNOWN"
+  | "FTA_UNFAIR_TERMS_REVIEW"
+  | "FTA_VALUE_UNKNOWN";
 export type Disposition =
-  | "signed-evidenced"
+  | "reported-signed"
   | "human-review"
   | "in-chase"
   | "negotiation"
@@ -131,6 +140,7 @@ export interface GateFinding {
 export interface EvaluatedRecord extends ReadinessRecord {
   gates: GateFinding[];
   insolvencyRemediation: InsolvencyRemediation;
+  evidenceStatus: EvidenceStatus;
   disposition: Disposition;
 }
 
@@ -140,7 +150,7 @@ export interface CampaignEvaluation {
 }
 
 const emptySummary = (): Record<Disposition, number> => ({
-  "signed-evidenced": 0,
+  "reported-signed": 0,
   "human-review": 0,
   "in-chase": 0,
   negotiation: 0,
@@ -174,6 +184,7 @@ export function evaluateRecord(record: ReadinessRecord): EvaluatedRecord {
     ...record,
     gates,
     insolvencyRemediation,
+    evidenceStatus: "unverified",
     disposition: chooseDisposition(record, gates, hasFlag, insolvencyRemediation)
   };
 }
@@ -227,8 +238,15 @@ function evaluateDebtorGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Verify the debtor record before sending standard T&Cs."
     });
   }
-  const debtorType = record.debtorType ?? "company";
-  if (debtorType !== "company") {
+  const debtorType = record.debtorType;
+  if (debtorType === undefined || debtorType === "unknown") {
+    findings.push({
+      severity: "review",
+      code: "DEBTOR_TYPE_UNKNOWN",
+      message: "Debtor type was not verified.",
+      recommendedNextAction: "Verify whether the debtor is a company, trust, partnership, or sole trader."
+    });
+  } else if (debtorType !== "company") {
     findings.push({
       severity: "review",
       code: "DEBTOR_TYPE_REQUIRES_HUMAN_REVIEW",
@@ -236,7 +254,14 @@ function evaluateDebtorGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Confirm capacity and signing authority for the non-company debtor."
     });
   }
-  if (record.legalNameVerified === false) {
+  if (record.legalNameVerified === undefined) {
+    findings.push({
+      severity: "review",
+      code: "LEGAL_NAME_VERIFICATION_UNKNOWN",
+      message: "Legal-name verification status was not supplied.",
+      recommendedNextAction: "Verify the registered legal name before sending."
+    });
+  } else if (record.legalNameVerified === false) {
     findings.push({
       severity: "review",
       code: "LEGAL_NAME_NOT_VERIFIED",
@@ -244,12 +269,28 @@ function evaluateDebtorGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Verify the legal name and incorporation number before sending."
     });
   }
-  if (debtorType === "company" && record.incorporationNumber !== undefined && !record.incorporationNumber.trim()) {
+  if ((debtorType === undefined || debtorType === "unknown" || debtorType === "company") && !record.incorporationNumber?.trim()) {
     findings.push({
       severity: "review",
       code: "INCORPORATION_NUMBER_MISSING",
       message: "Incorporation number is missing for a company debtor.",
       recommendedNextAction: "Confirm the incorporation number from the Companies Register."
+    });
+  }
+  if (record.ppsrCorrectionType === undefined) {
+    findings.push({
+      severity: "review",
+      code: "PPSR_CORRECTION_STATUS_UNKNOWN",
+      message: "PPSR correction status was not supplied.",
+      recommendedNextAction: "Classify the PPSR record as matched, amendable, re-registration, or counsel review."
+    });
+  }
+  if (record.securityAgreementStatus === undefined) {
+    findings.push({
+      severity: "review",
+      code: "SECURITY_AGREEMENT_STATUS_UNKNOWN",
+      message: "Security-agreement status was not supplied.",
+      recommendedNextAction: "Confirm whether a signed security agreement supports the PPSR registration."
     });
   }
   if (
@@ -386,7 +427,14 @@ function evaluateAgreementGate(record: ReadinessRecord): GateFinding {
 function evaluateInsolvencyGate(record: ReadinessRecord): GateFinding {
   const findings: Finding[] = [];
 
-  if (record.insolvencyRisk === "elevated") {
+  if (record.insolvencyRisk === undefined || record.insolvencyRisk === "unknown") {
+    findings.push({
+      severity: "review",
+      code: "INSOLVENCY_RISK_UNKNOWN",
+      message: "Insolvency or distress risk was not verified.",
+      recommendedNextAction: "Complete the insolvency-risk screen before selecting coverage."
+    });
+  } else if (record.insolvencyRisk === "elevated") {
     findings.push({
       severity: "review",
       code: "INSOLVENCY_RISK_ELEVATED",
@@ -402,7 +450,14 @@ function evaluateInsolvencyGate(record: ReadinessRecord): GateFinding {
       });
     }
   }
-  if (record.relatedParty === true) {
+  if (record.relatedParty === undefined) {
+    findings.push({
+      severity: "review",
+      code: "RELATED_PARTY_STATUS_UNKNOWN",
+      message: "Related-party status was not supplied.",
+      recommendedNextAction: "Confirm related-party status before applying a restricted-period analysis."
+    });
+  } else if (record.relatedParty === true) {
     findings.push({
       severity: "review",
       code: "RELATED_PARTY_CHARGE_RISK",
@@ -417,14 +472,21 @@ function evaluateInsolvencyGate(record: ReadinessRecord): GateFinding {
 function evaluateGuaranteeGate(record: ReadinessRecord): GateFinding {
   const findings: Finding[] = [];
 
-  if (record.hasPersonalGuarantee) {
+  if (record.hasPersonalGuarantee === undefined) {
     findings.push({
       severity: "review",
-      code: "PERSONAL_GUARANTEE_REQUIRES_SEPARATE_SIGNER",
-      message: "Personal guarantee requires a separate guarantor signer under PLA s 27(2).",
-      recommendedNextAction: "Identify and route a separate personal guarantor signer."
+      code: "GUARANTEE_STATUS_UNKNOWN",
+      message: "Personal-guarantee status was not supplied.",
+      recommendedNextAction: "Confirm whether the T&C package includes a personal guarantee."
     });
+  } else if (record.hasPersonalGuarantee) {
     if (!record.guarantorName?.trim() || !record.guarantorEmail?.includes("@")) {
+      findings.push({
+        severity: "review",
+        code: "PERSONAL_GUARANTEE_REQUIRES_SEPARATE_SIGNER",
+        message: "Personal guarantee requires a separate guarantor signer under PLA s 27(2).",
+        recommendedNextAction: "Identify and route a separate personal guarantor signer."
+      });
       findings.push({
         severity: "review",
         code: "GUARANTOR_MISSING",
@@ -433,7 +495,14 @@ function evaluateGuaranteeGate(record: ReadinessRecord): GateFinding {
       });
     }
   }
-  if (record.annualContractValueNzd !== undefined && record.annualContractValueNzd < 250_000) {
+  if (record.annualContractValueNzd === undefined) {
+    findings.push({
+      severity: "review",
+      code: "FTA_VALUE_UNKNOWN",
+      message: "The annual value of the trading relationship was not supplied.",
+      recommendedNextAction: "Assess the trading relationship value when it first arose, including GST and similar contracts."
+    });
+  } else if (record.annualContractValueNzd < 250_000) {
     findings.push({
       severity: "review",
       code: "FTA_UNFAIR_TERMS_REVIEW",
@@ -490,16 +559,16 @@ function chooseDisposition(
 
   const customerResponse = record.customerResponse ?? "not-sent";
 
-  if (customerResponse === "signed") return "signed-evidenced";
+  if (customerResponse === "signed") return "reported-signed";
   if (customerResponse === "negotiating") return "negotiation";
   if (customerResponse === "refused") return "credit-stop-review";
   if (customerResponse === "wet-ink") return "wet-ink-or-counsel";
 
-  if (
-    remediation.path === "future-supply-only" ||
-    remediation.path === "new-value-contemporaneous" ||
-    remediation.path === "standard-coverage"
-  ) {
+  if (remediation.path === "future-supply-only" || remediation.path === "new-value-contemporaneous") {
+    return "human-review";
+  }
+
+  if (remediation.path === "standard-coverage") {
     return "in-chase";
   }
 

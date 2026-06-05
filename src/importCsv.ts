@@ -59,7 +59,7 @@ export type OptionalReadinessCsvColumn = (typeof OPTIONAL_READINESS_CSV_COLUMNS)
 
 export interface CsvValidationError {
   row?: number;
-  column: ReadinessCsvColumn;
+  column: ReadinessCsvColumn | OptionalReadinessCsvColumn;
   message: string;
 }
 
@@ -157,9 +157,9 @@ export function parseReadinessCsv(input: string): CsvImportResult {
       errors
     );
     const coverage = validateEnum(row.coverage, "coverage", coverageValues, rowNumber, errors);
-    const eSignEligible = validateBoolean(row.e_sign_eligible, rowNumber, errors);
+    const eSignEligible = validateBoolean(row.e_sign_eligible, "e_sign_eligible", rowNumber, errors);
     const entityStatus = validateEnum(row.entity_status, "entity_status", entityStatusValues, rowNumber, errors);
-    const ppsrDebtorMatches = validateBoolean(row.ppsr_debtor_matches, rowNumber, errors);
+    const ppsrDebtorMatches = validateBoolean(row.ppsr_debtor_matches, "ppsr_debtor_matches", rowNumber, errors);
     const emailConfidence = validateEnum(
       row.email_confidence,
       "email_confidence",
@@ -167,7 +167,12 @@ export function parseReadinessCsv(input: string): CsvImportResult {
       rowNumber,
       errors
     );
-    const collateralClauseApproved = validateBoolean(row.collateral_clause_approved, rowNumber, errors);
+    const collateralClauseApproved = validateBoolean(
+      row.collateral_clause_approved,
+      "collateral_clause_approved",
+      rowNumber,
+      errors
+    );
     const customerResponse = validateEnum(
       row.customer_response,
       "customer_response",
@@ -290,7 +295,7 @@ export function parseReadinessCsv(input: string): CsvImportResult {
       continue;
     }
 
-    records.push({
+    const record: ReadinessRecord = {
       customerId: row.customer_id,
       tradingName: row.trading_name,
       legalName: row.legal_name,
@@ -308,25 +313,28 @@ export function parseReadinessCsv(input: string): CsvImportResult {
       ppsrDebtorMatches,
       emailConfidence,
       collateralClauseApproved,
-      customerResponse,
-      ...(optionalRow.debtor_type ? { debtorType } : {}),
-      ...(optionalRow.incorporation_number ? { incorporationNumber: optionalRow.incorporation_number } : {}),
-      ...(optionalRow.legal_name_verified ? { legalNameVerified } : {}),
-      ...(optionalRow.insolvency_risk ? { insolvencyRisk } : {}),
-      ...(optionalRow.related_party ? { relatedParty } : {}),
-      ...(optionalRow.legacy_balance_nzd ? { legacyBalanceNzd } : {}),
-      ...(optionalRow.will_extend_new_credit ? { willExtendNewCredit } : {}),
-      ...(optionalRow.new_credit_limit_nzd ? { newCreditLimitNzd } : {}),
-      ...(optionalRow.restricted_period_indicator ? { restrictedPeriodIndicator } : {}),
-      ...(optionalRow.commercially_worth_remediating ? { commerciallyWorthRemediating } : {}),
-      ...(optionalRow.residual_risk_approved_by ? { residualRiskApprovedBy: optionalRow.residual_risk_approved_by } : {}),
-      ...(optionalRow.annual_contract_value_nzd ? { annualContractValueNzd } : {}),
-      ...(optionalRow.has_personal_guarantee ? { hasPersonalGuarantee } : {}),
-      ...(optionalRow.guarantor_name ? { guarantorName: optionalRow.guarantor_name } : {}),
-      ...(optionalRow.guarantor_email ? { guarantorEmail: optionalRow.guarantor_email } : {}),
-      ...(optionalRow.ppsr_correction_type ? { ppsrCorrectionType } : {}),
-      ...(optionalRow.security_agreement_status ? { securityAgreementStatus } : {})
-    });
+      customerResponse
+    };
+
+    if (debtorType !== null) record.debtorType = debtorType;
+    if (optionalRow.incorporation_number) record.incorporationNumber = optionalRow.incorporation_number;
+    if (legalNameVerified !== null) record.legalNameVerified = legalNameVerified;
+    if (insolvencyRisk !== null) record.insolvencyRisk = insolvencyRisk;
+    if (relatedParty !== null) record.relatedParty = relatedParty;
+    if (legacyBalanceNzd !== null) record.legacyBalanceNzd = legacyBalanceNzd;
+    if (willExtendNewCredit !== null) record.willExtendNewCredit = willExtendNewCredit;
+    if (newCreditLimitNzd !== null) record.newCreditLimitNzd = newCreditLimitNzd;
+    if (restrictedPeriodIndicator !== null) record.restrictedPeriodIndicator = restrictedPeriodIndicator;
+    if (commerciallyWorthRemediating !== null) record.commerciallyWorthRemediating = commerciallyWorthRemediating;
+    if (optionalRow.residual_risk_approved_by) record.residualRiskApprovedBy = optionalRow.residual_risk_approved_by;
+    if (annualContractValueNzd !== null) record.annualContractValueNzd = annualContractValueNzd;
+    if (hasPersonalGuarantee !== null) record.hasPersonalGuarantee = hasPersonalGuarantee;
+    if (optionalRow.guarantor_name) record.guarantorName = optionalRow.guarantor_name;
+    if (optionalRow.guarantor_email) record.guarantorEmail = optionalRow.guarantor_email;
+    if (ppsrCorrectionType !== null) record.ppsrCorrectionType = ppsrCorrectionType;
+    if (securityAgreementStatus !== null) record.securityAgreementStatus = securityAgreementStatus;
+
+    records.push(record);
   }
 
   return errors.length > 0 ? { records: [], errors } : { records, errors: [] };
@@ -366,7 +374,12 @@ function validateEnum<T extends string>(
   return undefined;
 }
 
-function validateBoolean(value: string, rowNumber: number, errors: CsvValidationError[]): boolean | undefined {
+function validateBoolean(
+  value: string,
+  column: ReadinessCsvColumn,
+  rowNumber: number,
+  errors: CsvValidationError[]
+): boolean | undefined {
   const normalized = value.toLowerCase();
   if (normalized === "true") return true;
   if (normalized === "false") return false;
@@ -374,8 +387,8 @@ function validateBoolean(value: string, rowNumber: number, errors: CsvValidation
 
   errors.push({
     row: rowNumber,
-    column: "e_sign_eligible",
-    message: `Invalid e_sign_eligible "${value}"; expected true or false`
+    column,
+    message: `Invalid ${column} "${value}"; expected true or false`
   });
   return undefined;
 }
@@ -392,7 +405,7 @@ function validateOptionalEnum<T extends string>(
 
   errors.push({
     row: rowNumber,
-    column: column as ReadinessCsvColumn,
+    column,
     message: `Invalid ${column} "${value}"; expected one of: ${allowedValues.join(", ")}`
   });
   return undefined;
@@ -411,7 +424,7 @@ function validateOptionalBoolean(
 
   errors.push({
     row: rowNumber,
-    column: column as ReadinessCsvColumn,
+    column,
     message: `Invalid ${column} "${value}"; expected true or false`
   });
   return undefined;

@@ -2,7 +2,7 @@
 
 A local, bring-your-own-data MVP for the Legal Quants residency T&C / e-sign challenge.
 
-The thesis is simple: the useful answer is not a bulk sender. It is a judgment-led remediation campaign that validates readiness data, runs deterministic gates, and moves every account to an owned final state: signed and evidenced, negotiation, wet-ink / counsel path, credit-stop review, chase, or residual human review.
+The thesis is simple: the useful answer is not a bulk sender. It is a judgment-led remediation campaign that validates readiness data, runs deterministic gates, and moves every account to an owned state: reported signed, negotiation, wet-ink / counsel path, credit-stop review, chase, or residual human review.
 
 ![Pipeline diagram](docs/pipeline.svg)
 
@@ -17,7 +17,7 @@ The app parses and validates CSV rows before gate evaluation, shows gate finding
 - Prefilled synthetic T&C draft HTML files for clean in-chase records.
 - A chase tracker CSV.
 - An exception report CSV.
-- An evidence manifest CSV.
+- An evidence-status manifest CSV. The offline demo does not create verified evidence packets.
 
 ## What This Is Not
 
@@ -44,7 +44,7 @@ The local CSV must include these columns:
 
 `customer_id,trading_name,legal_name,nzbn,ppsr_registration_number,exposure_band,signer_name,signer_role,signer_email,authority_evidence,template_version,coverage,e_sign_eligible,entity_status,ppsr_debtor_matches,email_confidence,collateral_clause_approved,customer_response`
 
-Optional columns (legal-soundness fix — supply when enrichment is available; gates treat missing values as unknown and flag for review):
+Optional CSV columns carry load-bearing legal and commercial facts. When omitted, the evaluator treats them as unknown and routes the record for review:
 
 `debtor_type,incorporation_number,legal_name_verified,insolvency_risk,related_party,legacy_balance_nzd,will_extend_new_credit,new_credit_limit_nzd,restricted_period_indicator,commercially_worth_remediating,residual_risk_approved_by,annual_contract_value_nzd,has_personal_guarantee,guarantor_name,guarantor_email,ppsr_correction_type,security_agreement_status`
 
@@ -52,9 +52,16 @@ Allowed values are enforced by the parser before any gate evaluation runs.
 
 ## Pipeline
 
-`User CSV -> parse/validate -> readiness records -> gates -> clean records / exception queue -> prefilled drafts / chase tracker / exception report / evidence manifest`
+`User-asserted readiness data -> validation -> Gates A-E -> Gate D+ remediation recommendation -> owned disposition -> local synthetic artifacts`
 
 The checked-in diagram lives at `docs/pipeline.svg`.
+
+The diagram intentionally has two layers:
+
+- **Implemented now:** local parsing, deterministic gates, recommendations, dispositions, and synthetic downloads.
+- **Proposed / not implemented:** verified enrichment, approval workflow, locked templates, e-sign, chase operations, PPSR remediation, evidence packets, access controls, and audit/retention.
+
+The shared diagram vocabulary used by the React view lives in `src/pipelineDiagram.ts`.
 
 ### Legal framing
 
@@ -79,9 +86,19 @@ A validly signed security agreement makes the interest **enforceable against thi
 
 **PPSR close-loop (Gate A):** `PPSR_UNSUPPORTED_REGISTRATION` (unsigned security agreement + existing registration — s 162(d) demand-contingent exposure; prioritise signature chase by competitive/insolvency exposure); `PPSR_WRONG_ENTITY_REREGISTER` (wrong legal entity → re-register, priority resets per ss 41/66; trivial typo on valid registration → amend, priority preserved)
 
-**Gate D+ remediation router:** After Gate D detection, `resolveInsolvencyRemediation()` selects a clawback-mitigation path (`future-supply-only`, `new-value-contemporaneous`, `credit-stop`, etc.). Elevated insolvency with antecedent-debt coverage routes to `in-chase` with a remediation template when facts are complete — not a blind `human-review` dead-end. See `research/lq-residency/230-tc-esign-insolvency-survival-design.md`.
+**Gate D+ remediation router:** After Gate D detection, `resolveInsolvencyRemediation()` selects a proposed clawback-mitigation path (`future-supply-only`, `new-value-contemporaneous`, `credit-stop`, etc.). A path that changes coverage is a **deterministic recommendation**, not legal or commercial approval, and remains in `human-review`.
 
-**Disposition rules (Gate D/E):** related-party and unknown load-bearing insolvency fields still route to `human-review`; wrong-entity PPSR correction routes to `human-review` with re-register action.
+**Disposition rules (Gate D/E):** unknown load-bearing facts, related-party risk, an unapproved Gate D+ recommendation, and wrong-entity PPSR correction route to `human-review`.
+
+### State semantics
+
+| State | Meaning |
+|---|---|
+| **Reported signed** | The imported CSV says the customer signed. The demo does not independently verify a signature or evidence packet. |
+| **Evidence complete** | A future production state requiring the agreement, provider certificate, audit trail, hashes, approvals, and durable storage reference. |
+| **Deterministic recommendation** | A router output such as `future-supply-only`; it is not legal or commercial approval. |
+| **Approved remediation** | A future production state where an authorized owner has accepted the remediation path. |
+| **In chase** | An operational campaign state, separate from legal readiness and evidence completeness. |
 
 ## Tech Stack
 

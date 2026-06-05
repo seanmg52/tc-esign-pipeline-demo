@@ -72,7 +72,7 @@ Required work:
 - flag antecedent-debt coverage (`existing-only` or `future-and-existing`) when insolvency risk is elevated — Companies Act ss 292–293 voidable charge / preference risk;
 - screen related-party customers (longer restricted period);
 - prefer future-supply security structure where commercially viable (s 293(1A)(a) safe harbour for new value);
-- route elevated clawback risk to human review before bulk send.
+- route elevated clawback risk and any automated remediation recommendation to human approval before bulk send.
 
 ## 3b. Guarantee And Fair Trading Act Screening
 
@@ -187,7 +187,7 @@ Minimum acceptance tests:
 - material account with weak authority cannot auto-send;
 - e-sign ineligible record routes to wet-ink/counsel;
 - clean record produces locked envelope with correct merge fields;
-- signed envelope creates complete evidence packet;
+- provider-verified signed envelope creates complete evidence packet;
 - refusal triggers credit-stop review;
 - no external send occurs before all gates clear.
 

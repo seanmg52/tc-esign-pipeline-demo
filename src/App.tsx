@@ -1,12 +1,18 @@
 import { useMemo, useState, type ChangeEvent } from "react";
 import { generateCampaignArtifacts } from "./artifacts";
-import { parseReadinessCsv, READINESS_CSV_COLUMNS, type CsvValidationError } from "./importCsv";
+import {
+  OPTIONAL_READINESS_CSV_COLUMNS,
+  parseReadinessCsv,
+  READINESS_CSV_COLUMNS,
+  type CsvValidationError
+} from "./importCsv";
 import { evaluateCampaign, type Disposition, type EvaluatedRecord, type ReadinessRecord } from "./pipeline";
+import { pipelineDiagram, type DiagramNode } from "./pipelineDiagram";
 import { sampleRecords } from "./sampleRecords";
 import "./styles.css";
 
 const dispositionLabels: Record<Disposition, string> = {
-  "signed-evidenced": "Signed + evidenced",
+  "reported-signed": "Reported signed",
   "human-review": "Human review",
   "in-chase": "In chase loop",
   negotiation: "Negotiation",
@@ -15,7 +21,7 @@ const dispositionLabels: Record<Disposition, string> = {
 };
 
 const dispositionNotes: Record<Disposition, string> = {
-  "signed-evidenced": "Correct debtor, authority evidence, signed terms, audit packet.",
+  "reported-signed": "Imported signed status; provider evidence is not verified.",
   "human-review": "A gate flagged before the envelope should move.",
   "in-chase": "Sent or viewed, but not yet assented.",
   negotiation: "Commercial or legal variance requested.",
@@ -24,7 +30,7 @@ const dispositionNotes: Record<Disposition, string> = {
 };
 
 const sampleCsv = [
-  READINESS_CSV_COLUMNS.join(","),
+  [...READINESS_CSV_COLUMNS, ...OPTIONAL_READINESS_CSV_COLUMNS].join(","),
   [
     "SYN-101",
     "Example Timber",
@@ -43,7 +49,24 @@ const sampleCsv = [
     "true",
     "verified",
     "true",
-    "not-sent"
+    "not-sent",
+    "company",
+    "1001101",
+    "true",
+    "low",
+    "false",
+    "0",
+    "false",
+    "0",
+    "none",
+    "true",
+    "",
+    "300000",
+    "false",
+    "",
+    "",
+    "none",
+    "signed"
   ].join(",")
 ].join("\n");
 
@@ -151,9 +174,9 @@ export function App() {
           <p className="eyebrow">Runtime pipeline</p>
           <h2 id="diagram-title">Pipeline diagram</h2>
           <p>
-            A pre-enriched user CSV is parsed and validated into readiness records. The deterministic gates
-            split clean records from exceptions, then artifact generation creates local drafts, trackers, and
-            reports for review.
+            The upper layer shows what this browser prototype implements. The lower layer shows the verified
+            enrichment, approvals, e-sign operations, PPSR remediation, and evidence controls required for
+            production.
           </p>
         </div>
         <PipelineDiagram />
@@ -287,7 +310,7 @@ function ArtifactDownloads({ artifacts }: { artifacts: ReturnType<typeof generat
     {
       filename: "evidence-manifest.csv",
       label: "Evidence manifest",
-      description: "Signed synthetic records and evidence references.",
+      description: "Evidence-status rows only when evidence is independently complete.",
       content: artifacts.evidenceManifestCsv
     }
   ];
@@ -331,100 +354,85 @@ function downloadHref(content: string, contentType: string): string {
 }
 
 function PipelineDiagram() {
+  const currentInputs = pipelineDiagram.current.nodes.filter((node) => node.group === "input");
+  const controls = pipelineDiagram.current.nodes.filter((node) => node.group === "controls");
+  const dispositions = pipelineDiagram.current.nodes.filter((node) => node.group === "dispositions");
+  const outputs = pipelineDiagram.current.nodes.filter((node) => node.group === "outputs");
+
   return (
-    <div className="pipelineCanvas" role="img" aria-label="Pipeline for taking 230 no-T&C trade-credit customers through enrichment, verification, prefill, e-sign routing, chase, and evidence closeout.">
+    <div
+      className="pipelineCanvas twoLayerDiagram"
+      role="img"
+      aria-label="Two-layer pipeline diagram separating the implemented offline decision prototype from the proposed production remediation operating model."
+    >
       <div className="pipelineChrome">
         <div>
           <span className="chromeDot red" />
           <span className="chromeDot yellow" />
           <span className="chromeDot green" />
         </div>
-        <span className="chromeTitle">230-customer T&C signature pipeline</span>
-        <span className="chromeStatus">NZ trade credit</span>
+        <span className="chromeTitle">T&C remediation decision architecture</span>
+        <span className="chromeStatus">current + target</span>
       </div>
 
-      <div className="pipelineGrid">
-        <PipelineNode
-          tone="source"
-          eyebrow="Input"
-          title="User CSV"
-          body="Bundled synthetic data by default, or a locally pasted/uploaded readiness CSV."
-          meta={["BYO data", "offline", "synthetic sample"]}
-        />
-
-        <Connector label="scope" />
-
-        <PipelineNode
-          tone="compute"
-          eyebrow="Parse"
-          title="Parse + validate"
-          body="Check required columns and allowed values before any readiness gates run."
-          meta={["CSV schema", "row errors", "no network"]}
-        />
-
-        <Connector label="readiness" />
-
-        <div className="gateStack" aria-label="Pre-send verification gates">
-          <PipelineNode tone="gate" eyebrow="Records" title="Readiness records" body="Validated rows become the deterministic input record for each account." />
-          <PipelineNode tone="gate" eyebrow="Gates" title="Entity + authority + T&C" body="Findings identify blockers and review items before any draft is generated." />
-          <PipelineNode tone="gate" eyebrow="Disposition" title="Final state" body="Each account lands in chase, signed evidence, negotiation, credit-stop, wet-ink, or review." />
+      <section className="diagramLayer currentLayer">
+        <div className="diagramLayerHeader">
+          <span>Implemented</span>
+          <h3>{pipelineDiagram.current.label}</h3>
+          <p>{pipelineDiagram.current.disclaimer}</p>
         </div>
+        <DiagramRow label="User-asserted input" nodes={currentInputs} />
+        <DiagramRow label="Deterministic controls" nodes={controls} />
+        <DiagramRow label="Owned dispositions" nodes={dispositions} />
+        <DiagramRow label="Local output" nodes={outputs} />
+      </section>
 
-        <Connector label="exceptions" />
-
-        <PipelineNode
-          tone="router"
-          eyebrow="Route"
-          title="Clean / exception split"
-          body="Clean records feed local draft generation; flagged or non-sendable records move to the exception queue."
-          meta={["clean records", "exception queue", "human review"]}
-        />
-
-        <Connector label="campaign" />
-
-        <div className="outputStack" aria-label="Campaign outputs">
-          <PipelineNode tone="output" eyebrow="Draft" title="Prefilled drafts" body="Generate local synthetic HTML drafts for clean in-chase records." />
-          <PipelineNode tone="output" eyebrow="Track" title="Chase tracker" body="Export local CSVs for chase work, exception review, and evidence manifesting." />
-          <PipelineNode tone="output" eyebrow="Report" title="Exception + evidence" body="Download the exception report and evidence manifest for human review." />
+      <div className="decisionContract">
+        <strong>{pipelineDiagram.contract.label}</strong>
+        <div>
+          {pipelineDiagram.contract.items.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
         </div>
+      </div>
+
+      <section className="diagramLayer productionLayer">
+        <div className="diagramLayerHeader">
+          <span>Proposed</span>
+          <h3>{pipelineDiagram.production.label}</h3>
+          <p>{pipelineDiagram.production.disclaimer}</p>
+        </div>
+        <DiagramRow label="Verified operating model" nodes={pipelineDiagram.production.nodes} />
+        <p className="loopNote">Exceptions loop back through assigned owners and approval before any customer-facing action.</p>
+      </section>
+
+      <div className="diagramLegend" aria-label="Diagram legend">
+        <span><i className="legendSwatch data" /> Data / automation</span>
+        <span><i className="legendSwatch control" /> Deterministic control</span>
+        <span><i className="legendSwatch risk" /> Legal / risk branch</span>
+        <span><i className="legendSwatch human" /> Human checkpoint</span>
+        <span><i className="legendSwatch verified" /> Externally verified completion</span>
+        <span><i className="legendSwatch proposed" /> Proposed capability</span>
       </div>
     </div>
   );
 }
 
-function PipelineNode({
-  tone,
-  eyebrow,
-  title,
-  body,
-  meta = []
-}: {
-  tone: "source" | "compute" | "gate" | "router" | "output";
-  eyebrow: string;
-  title: string;
-  body: string;
-  meta?: string[];
-}) {
+function DiagramRow({ label, nodes }: { label: string; nodes: DiagramNode[] }) {
   return (
-    <article className={`pipelineNode ${tone}`}>
-      <span className="nodeEyebrow">{eyebrow}</span>
-      <strong>{title}</strong>
-      <p>{body}</p>
-      {meta.length > 0 && (
-        <div className="nodeMeta">
-          {meta.map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-        </div>
-      )}
-    </article>
-  );
-}
-
-function Connector({ label }: { label: string }) {
-  return (
-    <div className="connector" aria-hidden="true">
-      <span>{label}</span>
+    <div className="diagramRow">
+      <span className="diagramRowLabel">{label}</span>
+      <div className="diagramNodeGrid">
+        {nodes.map((node, index) => (
+          <div className="diagramNodeWithArrow" key={node.id}>
+            <article className={`diagramNode ${node.tone}`}>
+              <strong>{node.title}</strong>
+              <p>{node.body}</p>
+            </article>
+            {index < nodes.length - 1 && <span className="diagramArrow" aria-hidden="true">→</span>}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -50,11 +50,19 @@ function counselApprovedNewValueTemplate(record: ReadinessRecord): boolean {
 }
 
 export function resolveInsolvencyRemediation(record: ReadinessRecord): InsolvencyRemediation {
-  const insolvencyRisk = record.insolvencyRisk ?? "low";
-  const relatedParty = record.relatedParty ?? false;
-  const restrictedPeriod = record.restrictedPeriodIndicator ?? (relatedParty ? "related-party" : "none");
+  const insolvencyRisk = record.insolvencyRisk ?? "unknown";
+  const relatedParty = record.relatedParty;
+  const restrictedPeriod = record.restrictedPeriodIndicator ?? (relatedParty === true ? "related-party" : "unknown");
   const legacyBalance = record.legacyBalanceNzd ?? 0;
   const commerciallyWorth = record.commerciallyWorthRemediating ?? true;
+
+  if (relatedParty === undefined) {
+    return {
+      path: "counsel-restructure",
+      ...COUNSEL_RESTRUCTURE_PACKET,
+      rationale: "Related-party status unknown; fail closed because the applicable restricted period cannot be determined."
+    };
+  }
 
   if (relatedParty) {
     return {

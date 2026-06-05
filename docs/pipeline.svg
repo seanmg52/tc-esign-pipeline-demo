@@ -1,120 +1,145 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" role="img" aria-labelledby="title desc">
-  <title id="title">Offline T&amp;C pipeline MVP</title>
-  <desc id="desc">A pre-enriched user CSV flows through local parse and validation, readiness records, deterministic gates, clean records and exception queue, then local downloadable drafts, chase tracker, exception report, and evidence manifest.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 980" role="img" aria-labelledby="title desc">
+  <title id="title">Two-layer T&amp;C remediation decision architecture</title>
+  <desc id="desc">The upper solid layer shows the implemented offline browser prototype using user-supplied assertions, Gates A through E, the Gate D plus remediation recommendation, owned dispositions, and local synthetic outputs. A decision contract connects it to a dashed lower layer showing proposed production enrichment, approvals, e-sign, chase, PPSR remediation, evidence storage, audit, and retention.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.55" stop-color="#f8fbff"/>
+      <stop offset="0.58" stop-color="#f8fbff"/>
       <stop offset="1" stop-color="#eef2ff"/>
     </linearGradient>
-    <radialGradient id="glowA" cx="18%" cy="12%" r="38%">
-      <stop offset="0" stop-color="#14b8a6" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="glowB" cx="75%" cy="8%" r="36%">
-      <stop offset="0" stop-color="#6366f1" stop-opacity="0.16"/>
-      <stop offset="1" stop-color="#818cf8" stop-opacity="0"/>
-    </radialGradient>
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
-      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
-    </marker>
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="16" stdDeviation="16" flood-color="#334155" flood-opacity="0.16"/>
+      <feDropShadow dx="0" dy="9" stdDeviation="10" flood-color="#334155" flood-opacity="0.12"/>
     </filter>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#64748b"/>
+    </marker>
     <style>
-      .canvas{fill:url(#bg)}.glowA{fill:url(#glowA)}.glowB{fill:url(#glowB)}.grid{stroke:rgba(59,130,246,.07);stroke-width:1}.chrome{fill:rgba(255,255,255,.78);stroke:rgba(99,102,241,.16);stroke-width:1}.dotR{fill:#fb7185}.dotY{fill:#facc15}.dotG{fill:#34d399}.muted{fill:#64748b;font:800 13px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}.title{fill:#172033;font:800 17px Inter,Arial,sans-serif}.body{fill:#475569;font:600 13px Inter,Arial,sans-serif}.node{fill:rgba(255,255,255,.94);stroke:rgba(99,102,241,.16);stroke-width:1.2;filter:url(#shadow)}.source{stroke:#60a5fa;stroke-opacity:.5}.compute{stroke:#14b8a6;stroke-opacity:.55}.records{stroke:#a78bfa;stroke-opacity:.62}.gate{stroke:#94a3b8;stroke-opacity:.4}.clean{stroke:#22c55e;stroke-opacity:.65}.exception{stroke:#fb7185;stroke-opacity:.65}.output{stroke:#fb923c;stroke-opacity:.62}.edge{fill:none;stroke:#2563eb;stroke-width:2.2;stroke-linecap:round;marker-end:url(#arrow);opacity:.76}.small{fill:#0f766e;font:800 11px Inter,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+      .canvas{fill:url(#bg)}.frame{fill:#fff;fill-opacity:.78;stroke:#94a3b8;stroke-opacity:.42;stroke-width:2}.proposedFrame{stroke-dasharray:10 8}.band{fill:#eef1ff;stroke:#5b6fd8;stroke-width:2}.data{fill:#eff6ff;stroke:#60a5fa}.control{fill:#eef1ff;stroke:#8b93e8}.risk{fill:#fff1eb;stroke:#ea8a5b}.human{fill:#fff8df;stroke:#d8ae3c}.verified{fill:#eaf8f3;stroke:#58ae8c}.proposed{fill:#f8fafc;stroke:#7c8da8;stroke-dasharray:7 5}.node{stroke-width:1.5;filter:url(#shadow)}.edge{fill:none;stroke:#64748b;stroke-width:2;marker-end:url(#arrow)}.heading{fill:#172033;font:800 19px Inter,Arial,sans-serif}.section{fill:#475569;font:900 12px Inter,Arial,sans-serif;letter-spacing:.11em}.title{fill:#172033;font:800 14px Inter,Arial,sans-serif}.body{fill:#526078;font:600 11px Inter,Arial,sans-serif}.small{fill:#64748b;font:700 11px Inter,Arial,sans-serif}.pill{fill:#e0e7ff}.pillText{fill:#3730a3;font:900 10px Inter,Arial,sans-serif;letter-spacing:.1em}.legend{fill:#526078;font:700 10px Inter,Arial,sans-serif}
     </style>
   </defs>
-  <rect class="canvas" width="1280" height="620" rx="32"/>
-  <rect class="glowA" width="1280" height="620" rx="32"/>
-  <rect class="glowB" width="1280" height="620" rx="32"/>
-  <path class="grid" d="M80 0V620M160 0V620M240 0V620M320 0V620M400 0V620M480 0V620M560 0V620M640 0V620M720 0V620M800 0V620M880 0V620M960 0V620M1040 0V620M1120 0V620M1200 0V620M0 80H1280M0 160H1280M0 240H1280M0 320H1280M0 400H1280M0 480H1280M0 560H1280"/>
-  <rect class="chrome" x="42" y="34" width="1196" height="54" rx="18"/>
-  <circle class="dotR" cx="70" cy="61" r="6"/><circle class="dotY" cx="91" cy="61" r="6"/><circle class="dotG" cx="112" cy="61" r="6"/>
-  <text class="title" x="150" y="67">Offline T&amp;C pipeline MVP</text>
-  <text class="small" x="1055" y="66">local BYO-data</text>
 
-  <path class="edge" d="M198 304H270"/>
-  <path class="edge" d="M430 304H502"/>
-  <path class="edge" d="M662 304H734"/>
-  <path class="edge" d="M894 274C936 274 946 224 990 212"/>
-  <path class="edge" d="M894 334C936 334 946 392 990 406"/>
-  <path class="edge" d="M1112 170C1144 170 1154 150 1186 142"/>
-  <path class="edge" d="M1112 240C1144 240 1154 256 1186 262"/>
-  <path class="edge" d="M1112 368C1144 368 1154 378 1186 382"/>
-  <path class="edge" d="M1112 446C1144 446 1154 468 1186 478"/>
+  <rect class="canvas" width="1280" height="980" rx="30"/>
+  <text class="heading" x="52" y="48">T&amp;C remediation decision architecture</text>
+  <text class="small" x="52" y="68">Current offline prototype and proposed production operating model</text>
 
-  <g transform="translate(58 224)">
-    <rect class="node source" width="170" height="160" rx="22"/>
-    <text class="muted" x="20" y="32">Input</text>
-    <text class="title" x="20" y="62">User CSV</text>
-    <text class="body" x="20" y="92">Paste or upload</text>
-    <text class="body" x="20" y="113">pre-enriched</text>
-    <text class="body" x="20" y="134">readiness data.</text>
+  <rect class="frame" x="38" y="92" width="1204" height="420" rx="24"/>
+  <rect class="pill" x="58" y="112" width="146" height="24" rx="12"/>
+  <text class="pillText" x="131" y="128" text-anchor="middle">IMPLEMENTED NOW</text>
+  <text class="heading" x="58" y="160">Offline browser decision prototype</text>
+  <text class="small" x="58" y="180">User-supplied assertions. No external verification, sending, PPSR action, signature verification, or durable evidence storage.</text>
+
+  <text class="section" x="58" y="216">USER-ASSERTED INPUT</text>
+  <g transform="translate(58 230)">
+    <rect class="node data" width="170" height="72" rx="14"/>
+    <text class="title" x="14" y="28">Pre-enriched CSV</text>
+    <text class="body" x="14" y="48">Facts may be unverified.</text>
   </g>
-  <g transform="translate(270 232)">
-    <rect class="node compute" width="190" height="144" rx="22"/>
-    <text class="muted" x="20" y="32">Parse</text>
-    <text class="title" x="20" y="62">Parse / validate</text>
-    <text class="body" x="20" y="92">Check required</text>
-    <text class="body" x="20" y="113">columns and</text>
-    <text class="body" x="20" y="134">allowed values.</text>
+  <path class="edge" d="M228 266H252"/>
+  <g transform="translate(252 230)">
+    <rect class="node data" width="170" height="72" rx="14"/>
+    <text class="title" x="14" y="28">Parse + validate</text>
+    <text class="body" x="14" y="48">Schema and allowed values.</text>
   </g>
-  <g transform="translate(502 232)">
-    <rect class="node records" width="190" height="144" rx="22"/>
-    <text class="muted" x="20" y="32">Normalize</text>
-    <text class="title" x="20" y="62">Readiness records</text>
-    <text class="body" x="20" y="92">One structured</text>
-    <text class="body" x="20" y="113">record per</text>
-    <text class="body" x="20" y="134">account.</text>
+
+  <text class="section" x="452" y="216">DETERMINISTIC CONTROLS</text>
+  <g transform="translate(452 230)"><rect class="node control" width="112" height="72" rx="14"/><text class="title" x="12" y="27">Gate A / A+</text><text class="body" x="12" y="47">Entity, capacity,</text><text class="body" x="12" y="61">PPSR support</text></g>
+  <path class="edge" d="M564 266H578"/>
+  <g transform="translate(578 230)"><rect class="node control" width="104" height="72" rx="14"/><text class="title" x="12" y="27">Gate B</text><text class="body" x="12" y="47">Authority +</text><text class="body" x="12" y="61">delivery</text></g>
+  <path class="edge" d="M682 266H696"/>
+  <g transform="translate(696 230)"><rect class="node control" width="104" height="72" rx="14"/><text class="title" x="12" y="27">Gate C</text><text class="body" x="12" y="47">Package +</text><text class="body" x="12" y="61">e-sign route</text></g>
+  <path class="edge" d="M800 266H814"/>
+  <g transform="translate(814 230)"><rect class="node risk" width="104" height="72" rx="14"/><text class="title" x="12" y="27">Gate D</text><text class="body" x="12" y="47">Insolvency +</text><text class="body" x="12" y="61">clawback</text></g>
+  <path class="edge" d="M918 266H932"/>
+  <g transform="translate(932 230)"><rect class="node risk" width="118" height="72" rx="14"/><text class="title" x="12" y="27">Gate D+</text><text class="body" x="12" y="47">Remediation</text><text class="body" x="12" y="61">recommendation</text></g>
+  <path class="edge" d="M1050 266H1064"/>
+  <g transform="translate(1064 230)"><rect class="node control" width="118" height="72" rx="14"/><text class="title" x="12" y="27">Gate E</text><text class="body" x="12" y="47">Guarantee +</text><text class="body" x="12" y="61">FTA screen</text></g>
+
+  <text class="section" x="58" y="344">OWNED DISPOSITIONS</text>
+  <g transform="translate(58 358)"><rect class="node human" width="210" height="76" rx="14"/><text class="title" x="14" y="29">Reported signed</text><text class="body" x="14" y="50">CSV status; evidence unverified.</text></g>
+  <g transform="translate(286 358)"><rect class="node verified" width="190" height="76" rx="14"/><text class="title" x="14" y="29">In chase</text><text class="body" x="14" y="50">Clean standard draft candidate.</text></g>
+  <g transform="translate(494 358)"><rect class="node human" width="300" height="76" rx="14"/><text class="title" x="14" y="29">Human / counsel review</text><text class="body" x="14" y="50">Includes unapproved Gate D+ recommendations.</text></g>
+  <g transform="translate(812 358)"><rect class="node human" width="180" height="76" rx="14"/><text class="title" x="14" y="29">Negotiation</text><text class="body" x="14" y="50">Commercial or legal variance.</text></g>
+  <g transform="translate(1010 358)"><rect class="node human" width="172" height="76" rx="14"/><text class="title" x="14" y="29">Credit stop / wet ink</text><text class="body" x="14" y="50">Owned exception path.</text></g>
+
+  <path class="edge" d="M620 434V455H816"/>
+  <g transform="translate(816 440)">
+    <rect class="node data" width="366" height="66" rx="14"/>
+    <text class="title" x="14" y="22">Local synthetic outputs</text>
+    <text class="body" x="14" y="41">
+      <tspan x="14" dy="0">Draft HTML, chase tracker,</tspan>
+      <tspan x="14" dy="14">exceptions, evidence-status manifest</tspan>
+    </text>
   </g>
-  <g transform="translate(734 170)">
-    <rect class="node gate" width="190" height="92" rx="18"/>
-    <text class="muted" x="18" y="30">Gate A</text>
-    <text class="title" x="18" y="58">Entity / PPSR</text>
+
+  <rect class="band" x="156" y="534" width="968" height="88" rx="20"/>
+  <text class="section" x="566" y="558">DECISION CONTRACT</text>
+  <text class="title" x="224" y="586">facts + provenance   •   findings   •   recommendation   •   owner</text>
+  <text class="title" x="296" y="606">approval status   •   campaign status   •   evidence status</text>
+  <path class="edge" d="M640 512V532"/>
+  <path class="edge" d="M640 622V646"/>
+
+  <rect class="frame proposedFrame" x="38" y="648" width="1204" height="272" rx="24"/>
+  <rect x="58" y="668" width="88" height="24" rx="12" fill="#e2e8f0"/>
+  <text class="pillText" x="74" y="684" fill="#475569">PROPOSED</text>
+  <text class="heading" x="58" y="716">REQUIRED FOR PRODUCTION — verified remediation operating model</text>
+  <text class="small" x="58" y="736">External and proposed capabilities are not implemented in this repository.</text>
+
+  <g transform="translate(58 754)">
+    <rect class="node proposed" width="122" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Systems of</tspan><tspan x="12" dy="16">record</tspan></text>
+    <text class="body" x="12" y="64">CRM / ERP / credit</text>
   </g>
-  <g transform="translate(734 278)">
-    <rect class="node gate" width="190" height="92" rx="18"/>
-    <text class="muted" x="18" y="30">Gate B</text>
-    <text class="title" x="18" y="58">Signer authority</text>
+  <path class="edge" d="M180 796H194"/>
+  <g transform="translate(194 754)">
+    <rect class="node proposed" width="130" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Verified</tspan><tspan x="12" dy="16">enrichment</tspan></text>
+    <text class="body" x="12" y="64">NZBN / PPSR</text>
   </g>
-  <g transform="translate(734 386)">
-    <rect class="node gate" width="190" height="92" rx="18"/>
-    <text class="muted" x="18" y="30">Gate C</text>
-    <text class="title" x="18" y="58">T&amp;C package</text>
+  <path class="edge" d="M324 796H338"/>
+  <g transform="translate(338 754)">
+    <rect class="node proposed" width="144" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Canonical</tspan><tspan x="12" dy="16">record</tspan></text>
+    <text class="body" x="12" y="64">Provenance + refs</text>
   </g>
-  <g transform="translate(990 126)">
-    <rect class="node clean" width="170" height="116" rx="22"/>
-    <text class="muted" x="20" y="32">Clear path</text>
-    <text class="title" x="20" y="62">Clean records</text>
-    <text class="body" x="20" y="92">Ready for local</text>
-    <text class="body" x="20" y="113">draft output.</text>
+  <path class="edge" d="M482 796H496"/>
+  <g transform="translate(496 754)">
+    <rect class="node human" width="136" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Approval</tspan><tspan x="12" dy="16">checkpoint</tspan></text>
+    <text class="body" x="12" y="64">Counsel / credit</text>
   </g>
-  <g transform="translate(990 360)">
-    <rect class="node exception" width="170" height="116" rx="22"/>
-    <text class="muted" x="20" y="32">Review path</text>
-    <text class="title" x="20" y="62">Exception queue</text>
-    <text class="body" x="20" y="92">Flags, negotiation,</text>
-    <text class="body" x="20" y="113">wet ink, refusal.</text>
+  <path class="edge" d="M632 796H646"/>
+  <g transform="translate(646 754)">
+    <rect class="node proposed" width="116" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Locked</tspan><tspan x="12" dy="16">templates</tspan></text>
+    <text class="body" x="12" y="64">Controlled merge</text>
   </g>
-  <g transform="translate(1186 104)">
-    <rect class="node output" width="70" height="74" rx="16"/>
-    <text class="title" x="14" y="32">Drafts</text>
-    <text class="body" x="14" y="54">HTML</text>
+  <path class="edge" d="M762 796H776"/>
+  <g transform="translate(776 754)">
+    <rect class="node proposed" width="116" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">E-sign</tspan><tspan x="12" dy="16">lifecycle</tspan></text>
+    <text class="body" x="12" y="64">Provider events</text>
   </g>
-  <g transform="translate(1186 224)">
-    <rect class="node output" width="70" height="74" rx="16"/>
-    <text class="title" x="14" y="32">Chase</text>
-    <text class="body" x="14" y="54">CSV</text>
+  <path class="edge" d="M892 796H906"/>
+  <g transform="translate(906 754)">
+    <rect class="node proposed" width="116" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Chase +</tspan><tspan x="12" dy="16">PPSR</tspan></text>
+    <text class="body" x="12" y="64">Remediation loop</text>
   </g>
-  <g transform="translate(1186 344)">
-    <rect class="node output" width="70" height="74" rx="16"/>
-    <text class="title" x="14" y="32">Report</text>
-    <text class="body" x="14" y="54">CSV</text>
+  <path class="edge" d="M1022 796H1036"/>
+  <g transform="translate(1036 754)">
+    <rect class="node verified" width="146" height="84" rx="14"/>
+    <text class="title" x="12" y="24"><tspan x="12" dy="0">Evidence</tspan><tspan x="12" dy="16">packet</tspan></text>
+    <text class="body" x="12" y="64">Hashes + approvals</text>
   </g>
-  <g transform="translate(1186 464)">
-    <rect class="node output" width="70" height="74" rx="16"/>
-    <text class="title" x="14" y="32">Manifest</text>
-    <text class="body" x="14" y="54">CSV</text>
+
+  <g transform="translate(906 850)">
+    <rect class="node verified" width="276" height="60" rx="13"/>
+    <text class="title" x="12" y="21">Access-controlled store</text>
+    <text class="body" x="12" y="40"><tspan x="12" dy="0">RBAC, audit, retention,</tspan><tspan x="12" dy="14">durable retrieval</tspan></text>
   </g>
+  <path class="edge" d="M1109 838V848"/>
+  <path class="edge" d="M964 850C870 846 748 842 564 838"/>
+  <text class="small" x="58" y="878">Exceptions return to assigned owners and approval before customer-facing action.</text>
+
+  <text class="legend" x="58" y="950">Solid border = implemented   •   Dashed border = proposed/external   •   Orange = legal/risk   •   Amber = human checkpoint   •   Green = externally verified completion</text>
 </svg>

@@ -5,12 +5,12 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { App } from "./App";
-import { READINESS_CSV_COLUMNS } from "./importCsv";
+import { OPTIONAL_READINESS_CSV_COLUMNS, READINESS_CSV_COLUMNS } from "./importCsv";
 
 (globalThis as typeof globalThis & { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const validCsv = [
-  READINESS_CSV_COLUMNS.join(","),
+  [...READINESS_CSV_COLUMNS, ...OPTIONAL_READINESS_CSV_COLUMNS].join(","),
   [
     "SYN-900",
     "Harbour Tools",
@@ -29,7 +29,24 @@ const validCsv = [
     "true",
     "verified",
     "true",
-    "not-sent"
+    "not-sent",
+    "company",
+    "1001900",
+    "true",
+    "low",
+    "false",
+    "0",
+    "false",
+    "0",
+    "none",
+    "true",
+    "",
+    "300000",
+    "false",
+    "",
+    "",
+    "none",
+    "signed"
   ].join(",")
 ].join("\n");
 
@@ -77,7 +94,8 @@ describe("App", () => {
 
     expect(app.textContent).toContain("Using bundled synthetic example data");
     expect(app.textContent).toContain("Acme Supply");
-    expect(app.textContent).toContain("Signed + evidenced");
+    expect(app.textContent).toContain("Reported signed");
+    expect(app.textContent).toContain("Required for production");
   });
 
   it("shows CSV validation errors before evaluating gates", async () => {
