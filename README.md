@@ -6,22 +6,18 @@ The thesis is simple: the useful answer is not a bulk sender. It is a judgment-l
 
 ![Pipeline diagram](docs/pipeline.svg)
 
-## Live Demo
+## Diagram And Code
 
-After GitHub Pages deploys, the demo is available at:
+The codebase is the repository. The diagram is checked in at:
 
-`https://seanmg52.github.io/tc-esign-pipeline-demo/`
-
-Standalone pipeline diagram:
-
-`https://seanmg52.github.io/tc-esign-pipeline-demo/pipeline.svg`
+`docs/pipeline.svg`
 
 ## What It Shows
 
 - A deterministic readiness-record evaluator.
 - Three pre-send gates: debtor / PPSR, authority / delivery, and agreement / e-sign.
 - Synthetic sample records that route to different campaign dispositions.
-- A pipeline diagram in the "judgment before plumbing" style.
+- A light product-style pipeline diagram for how the demo code works.
 - A public architecture where AI can assist classification and drafting, but cannot decide enforceability.
 
 ## What It Does Not Do
@@ -49,8 +45,7 @@ sampleRecords.ts -> evaluateCampaign(records)
     -> Agreement / E-sign gate
     -> chooseDisposition(record, hasGateFlag)
   -> summary counts by disposition
-  -> React renders summary cards, record cards, and pipeline SVG
-  -> GitHub Actions runs tests/build and deploys dist/ to Pages
+  -> React renders summary cards, record cards, and pipeline visual
 ```
 
 ## Tech Stack
@@ -59,4 +54,3 @@ sampleRecords.ts -> evaluateCampaign(records)
 - React
 - TypeScript
 - Vitest
-- GitHub Pages
