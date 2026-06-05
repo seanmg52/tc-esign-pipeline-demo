@@ -1,4 +1,12 @@
-import type { AuthorityEvidence, Coverage, ExposureBand, ReadinessRecord } from "./pipeline";
+import type {
+  AuthorityEvidence,
+  Coverage,
+  CustomerResponse,
+  EmailConfidence,
+  EntityStatus,
+  ExposureBand,
+  ReadinessRecord
+} from "./pipeline";
 
 export const READINESS_CSV_COLUMNS = [
   "customer_id",
@@ -13,7 +21,12 @@ export const READINESS_CSV_COLUMNS = [
   "authority_evidence",
   "template_version",
   "coverage",
-  "e_sign_eligible"
+  "e_sign_eligible",
+  "entity_status",
+  "ppsr_debtor_matches",
+  "email_confidence",
+  "collateral_clause_approved",
+  "customer_response"
 ] as const;
 
 export type ReadinessCsvColumn = (typeof READINESS_CSV_COLUMNS)[number];
@@ -44,6 +57,17 @@ const coverageValues = [
   "future-and-existing",
   "counsel-review"
 ] as const satisfies readonly Coverage[];
+const entityStatusValues = ["active", "inactive", "unknown"] as const satisfies readonly EntityStatus[];
+const emailConfidenceValues = ["verified", "stale", "unknown"] as const satisfies readonly EmailConfidence[];
+const customerResponseValues = [
+  "not-sent",
+  "sent",
+  "viewed",
+  "signed",
+  "negotiating",
+  "refused",
+  "wet-ink"
+] as const satisfies readonly CustomerResponse[];
 
 export function parseReadinessCsv(input: string): CsvImportResult {
   const rows = parseCsv(input).filter((row) => row.some((cell) => cell.trim()));
@@ -89,8 +113,37 @@ export function parseReadinessCsv(input: string): CsvImportResult {
     );
     const coverage = validateEnum(row.coverage, "coverage", coverageValues, rowNumber, errors);
     const eSignEligible = validateBoolean(row.e_sign_eligible, rowNumber, errors);
+    const entityStatus = validateEnum(row.entity_status, "entity_status", entityStatusValues, rowNumber, errors);
+    const ppsrDebtorMatches = validateBoolean(row.ppsr_debtor_matches, rowNumber, errors);
+    const emailConfidence = validateEnum(
+      row.email_confidence,
+      "email_confidence",
+      emailConfidenceValues,
+      rowNumber,
+      errors
+    );
+    const collateralClauseApproved = validateBoolean(row.collateral_clause_approved, rowNumber, errors);
+    const customerResponse = validateEnum(
+      row.customer_response,
+      "customer_response",
+      customerResponseValues,
+      rowNumber,
+      errors
+    );
 
-    if (!exposureBand || !authorityEvidence || !coverage || eSignEligible === undefined) continue;
+    if (
+      !exposureBand ||
+      !authorityEvidence ||
+      !coverage ||
+      eSignEligible === undefined ||
+      !entityStatus ||
+      ppsrDebtorMatches === undefined ||
+      !emailConfidence ||
+      collateralClauseApproved === undefined ||
+      !customerResponse
+    ) {
+      continue;
+    }
     if (READINESS_CSV_COLUMNS.some((column) => !row[column])) continue;
 
     records.push({
@@ -106,7 +159,12 @@ export function parseReadinessCsv(input: string): CsvImportResult {
       authorityEvidence,
       templateVersion: row.template_version,
       coverage,
-      eSignEligible
+      eSignEligible,
+      entityStatus,
+      ppsrDebtorMatches,
+      emailConfidence,
+      collateralClauseApproved,
+      customerResponse
     });
   }
 

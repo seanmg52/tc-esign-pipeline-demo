@@ -147,6 +147,49 @@ describe("evaluateCampaign", () => {
     ]);
   });
 
+  it("requires explicit gate facts rather than assuming unknown values are safe", () => {
+    const result = evaluateCampaign([
+      {
+        customerId: "UNKNOWN-007",
+        tradingName: "Unknown Supply",
+        legalName: "Unknown Supply Limited",
+        nzbn: "9429000000007",
+        ppsrRegistrationNumber: "F000007",
+        exposureBand: "material",
+        signerName: "Uma Manager",
+        signerRole: "Manager",
+        signerEmail: "uma.manager@unknown.example",
+        authorityEvidence: "delegated-authority",
+        templateVersion: "tc-v4",
+        coverage: "future-and-existing",
+        eSignEligible: true
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate A - Entity / PPSR",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "ENTITY_STATUS_UNKNOWN" }),
+            expect.objectContaining({ code: "PPSR_DEBTOR_MATCH_UNKNOWN" })
+          ])
+        }),
+        expect.objectContaining({
+          name: "Gate B - Signer Authority",
+          findings: expect.arrayContaining([expect.objectContaining({ code: "DELIVERY_EMAIL_CONFIDENCE_UNKNOWN" })])
+        }),
+        expect.objectContaining({
+          name: "Gate C - T&C Package",
+          findings: expect.arrayContaining([expect.objectContaining({ code: "COLLATERAL_CLAUSE_APPROVAL_UNKNOWN" })])
+        })
+      ])
+    );
+  });
+
   it("separates refusal outcomes from clean signatures", () => {
     const result = evaluateCampaign([
       cleanRecord,

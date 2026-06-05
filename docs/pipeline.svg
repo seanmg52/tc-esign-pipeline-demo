@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 620" role="img" aria-labelledby="title desc">
   <title id="title">Offline T&amp;C pipeline MVP</title>
-  <desc id="desc">User CSV flows through local parse and validation, readiness records, deterministic gates, clean records and exception queue, then local downloadable drafts, chase tracker, exception report, and evidence manifest.</desc>
+  <desc id="desc">A pre-enriched user CSV flows through local parse and validation, readiness records, deterministic gates, clean records and exception queue, then local downloadable drafts, chase tracker, exception report, and evidence manifest.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#ffffff"/>
@@ -49,8 +49,8 @@
     <text class="muted" x="20" y="32">Input</text>
     <text class="title" x="20" y="62">User CSV</text>
     <text class="body" x="20" y="92">Paste or upload</text>
-    <text class="body" x="20" y="113">local readiness</text>
-    <text class="body" x="20" y="134">data.</text>
+    <text class="body" x="20" y="113">pre-enriched</text>
+    <text class="body" x="20" y="134">readiness data.</text>
   </g>
   <g transform="translate(270 232)">
     <rect class="node compute" width="190" height="144" rx="22"/>

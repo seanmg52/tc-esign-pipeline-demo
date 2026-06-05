@@ -16,7 +16,12 @@ const validCsv = [
     "director-record",
     "tc-v4",
     "future-and-existing",
-    "true"
+    "true",
+    "active",
+    "true",
+    "verified",
+    "true",
+    "not-sent"
   ].join(",")
 ].join("\n");
 
@@ -77,8 +82,33 @@ describe("parseReadinessCsv", () => {
         authorityEvidence: "director-record",
         templateVersion: "tc-v4",
         coverage: "future-and-existing",
-        eSignEligible: true
+        eSignEligible: true,
+        entityStatus: "active",
+        ppsrDebtorMatches: true,
+        emailConfidence: "verified",
+        collateralClauseApproved: true,
+        customerResponse: "not-sent"
       }
     ]);
+  });
+
+  it("requires gate fact columns instead of defaulting missing facts to safe values", () => {
+    const legacyCsv = [
+      "customer_id,trading_name,legal_name,nzbn,ppsr_registration_number,exposure_band,signer_name,signer_role,signer_email,authority_evidence,template_version,coverage,e_sign_eligible",
+      "SYN-001,Kauri Supplies,Kauri Supplies Limited,9429000001001,F123456,material,Aroha Director,Director,aroha.director@kauri.example,director-record,tc-v4,future-and-existing,true"
+    ].join("\n");
+
+    const result = parseReadinessCsv(legacyCsv);
+
+    expect(result.records).toEqual([]);
+    expect(result.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ column: "entity_status" }),
+        expect.objectContaining({ column: "ppsr_debtor_matches" }),
+        expect.objectContaining({ column: "email_confidence" }),
+        expect.objectContaining({ column: "collateral_clause_approved" }),
+        expect.objectContaining({ column: "customer_response" })
+      ])
+    );
   });
 });

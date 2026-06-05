@@ -24,7 +24,12 @@ const validCsv = [
     "director-record",
     "tc-v4",
     "future-and-existing",
-    "true"
+    "true",
+    "active",
+    "true",
+    "verified",
+    "true",
+    "not-sent"
   ].join(",")
 ].join("\n");
 

@@ -38,7 +38,12 @@ const sampleCsv = [
     "director-record",
     "tc-v4",
     "future-and-existing",
-    "true"
+    "true",
+    "active",
+    "true",
+    "verified",
+    "true",
+    "not-sent"
   ].join(",")
 ].join("\n");
 
@@ -89,8 +94,9 @@ export function App() {
         <p className="eyebrow">Offline BYO-data MVP</p>
         <h1>T&C e-sign remediation pipeline</h1>
         <p className="lede">
-          A local-only demo for Joshua's no-signed-T&C problem. Bring your own CSV, validate it in the
-          browser, run deterministic readiness gates, and download synthetic draft artifacts for review.
+          A local-only demo for Joshua's no-signed-T&C problem. Bring your own pre-enriched readiness CSV,
+          validate it in the browser, run deterministic workflow gates, and download synthetic draft artifacts
+          for review.
         </p>
         <div className="heroActions">
           <a href="#data">Load CSV</a>
@@ -106,7 +112,8 @@ export function App() {
           <h2 id="data-title">Paste or upload a readiness CSV</h2>
           <p>
             The app starts with bundled synthetic example data. Pasted or uploaded CSV content is parsed in
-            this browser session only; invalid rows show validation errors before any gate evaluation changes.
+            this browser session only. The CSV must already contain the enrichment facts the gates evaluate;
+            invalid rows show validation errors before any gate evaluation changes.
           </p>
         </div>
         <div className="sourceStatus">{sourceLabel}</div>
@@ -144,8 +151,8 @@ export function App() {
           <p className="eyebrow">Runtime pipeline</p>
           <h2 id="diagram-title">Pipeline diagram</h2>
           <p>
-            User CSV is parsed and validated into readiness records. The deterministic gates split clean
-            records from exceptions, then Phase 3 artifact generation creates local drafts, trackers, and
+            A pre-enriched user CSV is parsed and validated into readiness records. The deterministic gates
+            split clean records from exceptions, then artifact generation creates local drafts, trackers, and
             reports for review.
           </p>
         </div>

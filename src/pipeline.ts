@@ -27,15 +27,19 @@ export type GateName =
 export type FindingCode =
   | "NZBN_MISSING"
   | "PPSR_REGISTRATION_MISSING"
+  | "ENTITY_STATUS_UNKNOWN"
   | "ENTITY_NOT_ACTIVE"
+  | "PPSR_DEBTOR_MATCH_UNKNOWN"
   | "PPSR_DEBTOR_MISMATCH"
   | "SIGNER_MISSING"
   | "SIGNER_ROLE_MISSING"
   | "AUTHORITY_EVIDENCE_MISSING"
   | "DELIVERY_EMAIL_INVALID"
+  | "DELIVERY_EMAIL_CONFIDENCE_UNKNOWN"
   | "DELIVERY_EMAIL_UNVERIFIED"
   | "AUTHORITY_WEAK_FOR_MATERIAL_ACCOUNT"
   | "TC_TEMPLATE_MISSING"
+  | "COLLATERAL_CLAUSE_APPROVAL_UNKNOWN"
   | "COLLATERAL_CLAUSE_NOT_APPROVED"
   | "COVERAGE_NEEDS_COUNSEL_REVIEW"
   | "ESIGN_INELIGIBLE";
@@ -141,7 +145,14 @@ function evaluateDebtorGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Locate or create the PPSR reference before closing the evidence packet."
     });
   }
-  if ((record.entityStatus ?? "active") !== "active") {
+  if (record.entityStatus === undefined) {
+    findings.push({
+      severity: "review",
+      code: "ENTITY_STATUS_UNKNOWN",
+      message: "Legal entity status was not supplied.",
+      recommendedNextAction: "Supply entity status from NZBN/Miseiri enrichment before treating the record as clean."
+    });
+  } else if (record.entityStatus !== "active") {
     findings.push({
       severity: "blocker",
       code: "ENTITY_NOT_ACTIVE",
@@ -149,7 +160,14 @@ function evaluateDebtorGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Resolve the entity status before sending standard T&Cs."
     });
   }
-  if (record.ppsrDebtorMatches === false) {
+  if (record.ppsrDebtorMatches === undefined) {
+    findings.push({
+      severity: "review",
+      code: "PPSR_DEBTOR_MATCH_UNKNOWN",
+      message: "PPSR debtor match status was not supplied.",
+      recommendedNextAction: "Compare the PPSR debtor against the verified legal entity before sending."
+    });
+  } else if (record.ppsrDebtorMatches === false) {
     findings.push({
       severity: "blocker",
       code: "PPSR_DEBTOR_MISMATCH",
@@ -196,7 +214,14 @@ function evaluateAuthorityGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Correct the delivery email before preparing the envelope."
     });
   }
-  if ((record.emailConfidence ?? "verified") !== "verified") {
+  if (record.emailConfidence === undefined) {
+    findings.push({
+      severity: "review",
+      code: "DELIVERY_EMAIL_CONFIDENCE_UNKNOWN",
+      message: "Delivery email confidence was not supplied.",
+      recommendedNextAction: "Supply email confidence from the readiness record before treating the address as verified."
+    });
+  } else if (record.emailConfidence !== "verified") {
     findings.push({
       severity: "review",
       code: "DELIVERY_EMAIL_UNVERIFIED",
@@ -227,7 +252,14 @@ function evaluateAgreementGate(record: ReadinessRecord): GateFinding {
       recommendedNextAction: "Select the approved T&C template before preparing the envelope."
     });
   }
-  if (record.collateralClauseApproved === false) {
+  if (record.collateralClauseApproved === undefined) {
+    findings.push({
+      severity: "review",
+      code: "COLLATERAL_CLAUSE_APPROVAL_UNKNOWN",
+      message: "Collateral / security clause approval status was not supplied.",
+      recommendedNextAction: "Confirm the approved T&C/security package before generating customer-facing drafts."
+    });
+  } else if (record.collateralClauseApproved === false) {
     findings.push({
       severity: "review",
       code: "COLLATERAL_CLAUSE_NOT_APPROVED",
