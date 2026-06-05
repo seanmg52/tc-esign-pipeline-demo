@@ -142,8 +142,7 @@ h3 {
 }
 
 .pipelineChrome,
-.pipelineGrid,
-.deployRail {
+.pipelineGrid {
   position: relative;
   z-index: 1;
 }
@@ -243,8 +242,7 @@ h3 {
   border-color: rgba(96, 165, 250, 0.32);
 }
 
-.pipelineNode.compute,
-.pipelineNode.deploy {
+.pipelineNode.compute {
   border-color: rgba(45, 212, 191, 0.34);
 }
 
@@ -262,10 +260,6 @@ h3 {
 
 .pipelineNode.output {
   border-color: rgba(251, 146, 60, 0.42);
-}
-
-.pipelineNode.test {
-  border-color: rgba(148, 163, 184, 0.35);
 }
 
 .nodeEyebrow {
@@ -337,35 +331,6 @@ h3 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
-}
-
-.deployRail {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px minmax(0, 1fr);
-  align-items: center;
-  border: 1px solid rgba(99, 102, 241, 0.14);
-  border-radius: 22px;
-  margin-top: 8px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.58);
-}
-
-.railLine {
-  height: 2px;
-  margin: 0 14px;
-  background: linear-gradient(90deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.8));
-}
-
-.railLine::after {
-  display: block;
-  float: right;
-  width: 10px;
-  height: 10px;
-  margin-top: -4px;
-  content: "";
-  border-top: 2px solid rgba(99, 102, 241, 0.85);
-  border-right: 2px solid rgba(99, 102, 241, 0.85);
-  transform: rotate(45deg);
 }
 
 .summaryGrid {
@@ -559,25 +524,6 @@ dd {
     top: 50%;
     left: calc(50% + 24px);
     transform: translateY(-50%);
-  }
-
-  .deployRail {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .railLine {
-    width: 2px;
-    height: 38px;
-    margin: 0 auto;
-    background: linear-gradient(180deg, rgba(129, 140, 248, 0.2), rgba(129, 140, 248, 0.95));
-  }
-
-  .railLine::after {
-    float: none;
-    margin-top: 28px;
-    margin-left: -4px;
-    transform: rotate(135deg);
   }
 
   .summaryGrid {

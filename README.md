@@ -14,11 +14,10 @@ The codebase is the repository. The diagram is checked in at:
 
 ## What It Shows
 
-- A deterministic readiness-record evaluator.
-- Three pre-send gates: debtor / PPSR, authority / delivery, and agreement / e-sign.
-- Synthetic sample records that route to different campaign dispositions.
-- A light product-style pipeline diagram for how the demo code works.
-- A public architecture where AI can assist classification and drafting, but cannot decide enforceability.
+- A proposed remediation pipeline for Joshua Wong's ~230 no-T&C trade-credit customers.
+- Three pre-send gates: entity match, signer authority, and T&C package readiness.
+- A light product-style pipeline diagram focused on the business/legal workflow.
+- A public code sketch showing how records can be classified without deciding enforceability by AI.
 
 ## What It Does Not Do
 
@@ -35,17 +34,18 @@ npm run build
 npm run dev
 ```
 
-## Application Pipeline
+## Proposed Pipeline
 
 ```txt
-sampleRecords.ts -> evaluateCampaign(records)
-  -> evaluateRecord(record)
-    -> Debtor / PPSR gate
-    -> Authority / Delivery gate
-    -> Agreement / E-sign gate
-    -> chooseDisposition(record, hasGateFlag)
-  -> summary counts by disposition
-  -> React renders summary cards, record cards, and pipeline visual
+~230 no-T&C customers
+  -> segment by exposure and enrich with Miseiri / NZBN / PPSR data
+  -> Gate A: entity match
+  -> Gate B: signer authority
+  -> Gate C: T&C package readiness
+  -> exception queue for mismatches, authority gaps, negotiation, or wet-ink cases
+  -> prefilled envelopes for clean records
+  -> chase loop
+  -> signed evidence packet and PPSR closeout
 ```
 
 ## Tech Stack

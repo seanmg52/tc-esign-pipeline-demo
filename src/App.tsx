@@ -127,66 +127,61 @@ function RecordCard({ record }: { record: EvaluatedRecord }) {
 
 function PipelineDiagram() {
   return (
-    <div className="pipelineCanvas" role="img" aria-label="Application pipeline from sample data through deterministic evaluator, rendered UI, tests, build, and GitHub Pages deploy.">
+    <div className="pipelineCanvas" role="img" aria-label="Pipeline for taking 230 no-T&C trade-credit customers through enrichment, verification, prefill, e-sign routing, chase, and evidence closeout.">
       <div className="pipelineChrome">
         <div>
           <span className="chromeDot red" />
           <span className="chromeDot yellow" />
           <span className="chromeDot green" />
         </div>
-        <span className="chromeTitle">tc-esign-pipeline-demo / runtime graph</span>
-        <span className="chromeStatus">5 synthetic records</span>
+        <span className="chromeTitle">230-customer T&C signature pipeline</span>
+        <span className="chromeStatus">NZ trade credit</span>
       </div>
 
       <div className="pipelineGrid">
         <PipelineNode
           tone="source"
-          eyebrow="Input"
-          title="sampleRecords.ts"
-          body="Synthetic readiness records. No DocuSign, NZBN, PPSR, customer data, or PII."
-          meta={["ReadinessRecord[]", "fake .example emails", "5 demo accounts"]}
+          eyebrow="Starting batch"
+          title="~230 customers"
+          body="Existing trade-credit customers with no signed T&Cs on file after the 800-to-230 cleanup."
+          meta={["lower exposure", "existing accounts", "no T&Cs"]}
         />
 
-        <Connector label="records" />
+        <Connector label="scope" />
 
         <PipelineNode
           tone="compute"
-          eyebrow="Evaluator"
-          title="Campaign evaluator"
-          body="Maps each account through deterministic gates, then aggregates disposition counts."
-          meta={["evaluateRecord()", "summary reducer", "pure TypeScript"]}
+          eyebrow="Prepare"
+          title="Segment + enrich"
+          body="Use exposure bands, Miseiri/NZBN data, contact details, and PPSR references to create a readiness record."
+          meta={["Miseiri", "NZBN", "PPSR refs"]}
         />
 
-        <Connector label="fan out" />
+        <Connector label="readiness" />
 
-        <div className="gateStack" aria-label="Three deterministic gates">
-          <PipelineNode tone="gate" eyebrow="Gate A" title="Debtor / PPSR" body="Checks entity status, NZBN presence, and PPSR debtor match." />
-          <PipelineNode tone="gate" eyebrow="Gate B" title="Authority / Delivery" body="Checks signer, authority evidence, delivery email, and exposure-sensitive proof." />
-          <PipelineNode tone="gate" eyebrow="Gate C" title="Agreement / E-sign" body="Checks template version, collateral clause, coverage, and e-sign eligibility." />
+        <div className="gateStack" aria-label="Pre-send verification gates">
+          <PipelineNode tone="gate" eyebrow="Gate A" title="Entity match" body="Canonical legal name, NZBN status, trading-name mismatch, and PPSR debtor alignment." />
+          <PipelineNode tone="gate" eyebrow="Gate B" title="Signer authority" body="Named signer, role, delivery email, authority evidence, and escalation tier." />
+          <PipelineNode tone="gate" eyebrow="Gate C" title="T&C package" body="Locked standard terms, approved merge fields, security clause, and e-sign eligibility." />
         </div>
 
-        <Connector label="findings" />
+        <Connector label="exceptions" />
 
         <PipelineNode
           tone="router"
-          eyebrow="Router"
-          title="Disposition router"
-          body="Combines gate status with customer response to classify the account."
-          meta={["signed", "human review", "negotiation", "credit-stop", "wet-ink"]}
+          eyebrow="Route"
+          title="Exception queue"
+          body="Auto-send clean records; route mismatches, authority gaps, negotiation, or wet-ink cases to humans."
+          meta={["auto-send", "human review", "wet-ink"]}
         />
 
-        <Connector label="view model" />
+        <Connector label="campaign" />
 
-        <div className="outputStack" aria-label="Rendered outputs">
-          <PipelineNode tone="output" eyebrow="UI output" title="Summary cards" body="Counts every disposition and shows campaign shape at a glance." />
-          <PipelineNode tone="output" eyebrow="UI output" title="Record cards" body="Shows each account, gate status, findings, and final disposition." />
+        <div className="outputStack" aria-label="Campaign outputs">
+          <PipelineNode tone="output" eyebrow="Send" title="Prefilled envelopes" body="Generate standard T&Cs with verified customer details and route for online signature." />
+          <PipelineNode tone="output" eyebrow="Operate" title="Chase loop" body="Track opened, signed, refused, negotiated, bounced, and non-responsive accounts." />
+          <PipelineNode tone="output" eyebrow="Close" title="Evidence + PPSR" body="Store signed agreement and audit trail; link or remediate PPSR records where needed." />
         </div>
-      </div>
-
-      <div className="deployRail">
-        <PipelineNode tone="test" eyebrow="Verification" title="Vitest + build" body="pipeline.test.ts proves evaluator behavior; Vite builds the static app." />
-        <div className="railLine" />
-        <PipelineNode tone="deploy" eyebrow="Publish" title="GitHub Pages" body="deploy.yml runs npm ci, tests, build, then serves dist/ at the public URL." />
       </div>
     </div>
   );
@@ -199,7 +194,7 @@ function PipelineNode({
   body,
   meta = []
 }: {
-  tone: "source" | "compute" | "gate" | "router" | "output" | "test" | "deploy";
+  tone: "source" | "compute" | "gate" | "router" | "output";
   eyebrow: string;
   title: string;
   body: string;
