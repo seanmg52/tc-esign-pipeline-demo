@@ -13,12 +13,21 @@ Required data:
 - internal customer ID and business unit;
 - trading name and contracting legal entity;
 - NZBN and entity status from NZBN/Miseiri;
+- **debtor type** (`company` | `trust` | `partnership` | `sole-trader` | `unknown`) — capacity gate; non-company routes to human review by default;
+- **registered legal name verified** (boolean) and **incorporation / registration number** — PPSA s 142 load-bearing fields; NZBN alone is insufficient for registration validity;
 - addresses and contact details used for T&C delivery;
 - existing PPSR financing-statement registration number, if any;
 - PPSR debtor name / identifier and whether it matches the verified legal entity;
+- **PPSR correction type** (`none` | `amend-typo` | `re-register-wrong-entity` | `counsel-review`) — wrong legal entity requires re-registration (priority resets); trivial typo on valid registration may amend;
+- **security agreement status** (`signed` | `unsigned` | `unknown`) — unsigned registration with no agreement behind it is s 162(d) discharge-vulnerable on demand;
 - live exposure band and account owner;
+- **insolvency / distress risk** (`low` | `elevated` | `unknown`) — distinct from recoverable exposure; drives clawback screening;
+- **related party** (boolean) — restricted period is ~2 years for related parties vs ~6 months for unrelated;
+- **annual contract value (NZD)** — FTA specified-trade-contract unfair-terms screen below $250k/yr;
 - proposed signer name, role, email, and authority evidence;
+- **personal guarantee flag**, and if true: **guarantor name** and **guarantor email** as a natural person distinct from the company signatory (PLA s 27(2));
 - T&C template version and security/collateral clause version;
+- **coverage** (`future-only` | `existing-only` | `future-and-existing` | `counsel-review`) — antecedent-debt coverage on elevated insolvency triggers clawback review;
 - e-sign eligibility and any wet-ink / counsel routing reason;
 - customer campaign status: not sent, sent, viewed, signed, negotiating, refused, wet-ink.
 
@@ -44,12 +53,35 @@ Required work:
 
 - call the PPSR MCP/API or import a PPSR export;
 - retrieve existing financing statement data for each customer;
-- compare PPSR debtor identity against the verified legal entity;
-- classify correction type: no registration, match, mismatch, stale debtor, duplicate, or counsel review;
-- decide whether amendment, discharge/re-registration, new registration, or residual-risk approval is required;
+- compare PPSR debtor identity against the verified legal entity (s 142 legal name + incorporation number, not NZBN alone);
+- classify correction type: no registration, match, amend-typo, re-register-wrong-entity, stale debtor, duplicate, unsupported registration (unsigned agreement), or counsel review;
+- decide whether amendment (typo on valid registration — priority preserved), re-registration (wrong entity — priority resets per ss 41/66), new registration, or residual-risk approval is required;
+- do not discharge valid early registrations — register-first/attach-later preserves original priority date (s 66);
+- prioritise signature chase for unsigned registrations by competitive exposure and insolvency risk (s 162(d) is demand-contingent, not a running clock);
 - capture before/after registration evidence.
 
 This MVP does not make PPSR changes.
+
+## 3a. Insolvency And Clawback Screening
+
+The real pipeline must treat enforceability (PPSA) and insolvency survival (Companies Act) as separate axes.
+
+Required work:
+
+- screen insolvency / distress risk independently from recoverable exposure;
+- flag antecedent-debt coverage (`existing-only` or `future-and-existing`) when insolvency risk is elevated — Companies Act ss 292–293 voidable charge / preference risk;
+- screen related-party customers (longer restricted period);
+- prefer future-supply security structure where commercially viable (s 293(1A)(a) safe harbour for new value);
+- route elevated clawback risk to human review before bulk send.
+
+## 3b. Guarantee And Fair Trading Act Screening
+
+Required work:
+
+- branch when T&C sets include personal guarantees: capture guarantor as natural person distinct from company signatory (PLA s 27(2); CCLA s 226 applies to guarantees);
+- ensure guarantee signing block manifests personal signature, not representative capacity;
+- screen sub-$250k annual contract value against FTA specified-trade-contract unfair-terms regime (ss 26B–26E, s 46L);
+- route flagged records to counsel review of standard terms before bulk send.
 
 ## 4. Authority Verification
 
@@ -146,7 +178,12 @@ Minimum acceptance tests:
 
 - raw customer export imports correctly;
 - Miseiri/NZBN enrichment flags low-confidence matches;
-- PPSR mismatch cannot auto-clear;
+- non-company debtor type (trust, partnership, sole trader) cannot auto-clear on NZBN match alone;
+- PPSR mismatch or wrong-entity correction cannot auto-clear;
+- elevated insolvency risk + antecedent-debt coverage routes to human review;
+- unsigned PPSR registration with no security agreement flags s 162(d) exposure;
+- personal guarantee without separate guarantor signer cannot auto-send;
+- sub-$250k annual contract triggers FTA unfair-terms review;
 - material account with weak authority cannot auto-send;
 - e-sign ineligible record routes to wet-ink/counsel;
 - clean record produces locked envelope with correct merge fields;

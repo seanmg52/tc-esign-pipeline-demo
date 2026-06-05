@@ -139,12 +139,177 @@ describe("evaluateCampaign", () => {
     const evaluated = result.records[0];
 
     expect(evaluated.disposition).toBe("in-chase");
-    expect(evaluated.gates).toHaveLength(3);
+    expect(evaluated.gates).toHaveLength(5);
     expect(evaluated.gates).toEqual([
       { name: "Gate A - Entity / PPSR", status: "clear", findings: [] },
       { name: "Gate B - Signer Authority", status: "clear", findings: [] },
-      { name: "Gate C - T&C Package", status: "clear", findings: [] }
+      { name: "Gate C - T&C Package", status: "clear", findings: [] },
+      { name: "Gate D - Insolvency / Clawback", status: "clear", findings: [] },
+      { name: "Gate E - Guarantee / FTA", status: "clear", findings: [] }
     ]);
+  });
+
+  it("routes trust debtors to human review", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "TRUST-008",
+        debtorType: "trust",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate A - Entity / PPSR",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "DEBTOR_TYPE_REQUIRES_HUMAN_REVIEW" })
+          ])
+        })
+      ])
+    );
+  });
+
+  it("routes elevated insolvency with existing-only coverage to future-supply-only via remediation router", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "CLAW-009",
+        coverage: "existing-only",
+        insolvencyRisk: "elevated",
+        legacyBalanceNzd: 45_000,
+        commerciallyWorthRemediating: true,
+        restrictedPeriodIndicator: "unrelated",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("in-chase");
+    expect(evaluated.insolvencyRemediation.path).toBe("future-supply-only");
+    expect(evaluated.insolvencyRemediation.templateVariantId).toBe("tc-v4-future-supply-only");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate D - Insolvency / Clawback",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "INSOLVENCY_RISK_ELEVATED" }),
+            expect.objectContaining({ code: "ANTECEDENT_DEBT_CLAWBACK_RISK" })
+          ])
+        })
+      ])
+    );
+  });
+
+  it("flags unsigned PPSR registrations that need signature chase", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "PPSR-010",
+        securityAgreementStatus: "unsigned",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate A - Entity / PPSR",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "PPSR_UNSUPPORTED_REGISTRATION" })
+          ])
+        })
+      ])
+    );
+  });
+
+  it("flags wrong-entity PPSR corrections for re-registration", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "REREG-011",
+        ppsrCorrectionType: "re-register-wrong-entity",
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate A - Entity / PPSR",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "PPSR_WRONG_ENTITY_REREGISTER" })
+          ])
+        })
+      ])
+    );
+  });
+
+  it("flags personal guarantees missing guarantor details", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "GUAR-012",
+        hasPersonalGuarantee: true,
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate E - Guarantee / FTA",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "GUARANTOR_MISSING" })
+          ])
+        })
+      ])
+    );
+  });
+
+  it("flags sub-250k contracts for FTA unfair-terms review", () => {
+    const result = evaluateCampaign([
+      {
+        ...cleanRecord,
+        customerId: "FTA-013",
+        annualContractValueNzd: 120_000,
+        customerResponse: "not-sent"
+      }
+    ]);
+
+    const evaluated = result.records[0];
+
+    expect(evaluated.disposition).toBe("human-review");
+    expect(evaluated.gates).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: "Gate E - Guarantee / FTA",
+          status: "flagged",
+          findings: expect.arrayContaining([
+            expect.objectContaining({ code: "FTA_UNFAIR_TERMS_REVIEW" })
+          ])
+        })
+      ])
+    );
   });
 
   it("requires explicit gate facts rather than assuming unknown values are safe", () => {

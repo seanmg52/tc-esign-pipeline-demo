@@ -2,10 +2,15 @@ import type {
   AuthorityEvidence,
   Coverage,
   CustomerResponse,
+  DebtorType,
   EmailConfidence,
   EntityStatus,
   ExposureBand,
-  ReadinessRecord
+  InsolvencyRisk,
+  PpsrCorrectionType,
+  ReadinessRecord,
+  RestrictedPeriodIndicator,
+  SecurityAgreementStatus
 } from "./pipeline";
 
 export const READINESS_CSV_COLUMNS = [
@@ -29,7 +34,28 @@ export const READINESS_CSV_COLUMNS = [
   "customer_response"
 ] as const;
 
+export const OPTIONAL_READINESS_CSV_COLUMNS = [
+  "debtor_type",
+  "incorporation_number",
+  "legal_name_verified",
+  "insolvency_risk",
+  "related_party",
+  "legacy_balance_nzd",
+  "will_extend_new_credit",
+  "new_credit_limit_nzd",
+  "restricted_period_indicator",
+  "commercially_worth_remediating",
+  "residual_risk_approved_by",
+  "annual_contract_value_nzd",
+  "has_personal_guarantee",
+  "guarantor_name",
+  "guarantor_email",
+  "ppsr_correction_type",
+  "security_agreement_status"
+] as const;
+
 export type ReadinessCsvColumn = (typeof READINESS_CSV_COLUMNS)[number];
+export type OptionalReadinessCsvColumn = (typeof OPTIONAL_READINESS_CSV_COLUMNS)[number];
 
 export interface CsvValidationError {
   row?: number;
@@ -68,6 +94,25 @@ const customerResponseValues = [
   "refused",
   "wet-ink"
 ] as const satisfies readonly CustomerResponse[];
+const debtorTypeValues = ["company", "trust", "partnership", "sole-trader", "unknown"] as const satisfies readonly DebtorType[];
+const insolvencyRiskValues = ["low", "elevated", "unknown"] as const satisfies readonly InsolvencyRisk[];
+const restrictedPeriodValues = [
+  "none",
+  "unrelated",
+  "related-party",
+  "unknown"
+] as const satisfies readonly RestrictedPeriodIndicator[];
+const ppsrCorrectionTypeValues = [
+  "none",
+  "amend-typo",
+  "re-register-wrong-entity",
+  "counsel-review"
+] as const satisfies readonly PpsrCorrectionType[];
+const securityAgreementStatusValues = [
+  "signed",
+  "unsigned",
+  "unknown"
+] as const satisfies readonly SecurityAgreementStatus[];
 
 export function parseReadinessCsv(input: string): CsvImportResult {
   const rows = parseCsv(input).filter((row) => row.some((cell) => cell.trim()));
@@ -146,6 +191,105 @@ export function parseReadinessCsv(input: string): CsvImportResult {
     }
     if (READINESS_CSV_COLUMNS.some((column) => !row[column])) continue;
 
+    const optionalRow = Object.fromEntries(
+      OPTIONAL_READINESS_CSV_COLUMNS.map((column) => [
+        column,
+        sourceRow[columnIndex.get(column) ?? -1]?.trim() ?? ""
+      ])
+    ) as Record<OptionalReadinessCsvColumn, string>;
+
+    const debtorType = validateOptionalEnum(
+      optionalRow.debtor_type,
+      "debtor_type",
+      debtorTypeValues,
+      rowNumber,
+      errors
+    );
+    const legalNameVerified = validateOptionalBoolean(optionalRow.legal_name_verified, "legal_name_verified", rowNumber, errors);
+    const insolvencyRisk = validateOptionalEnum(
+      optionalRow.insolvency_risk,
+      "insolvency_risk",
+      insolvencyRiskValues,
+      rowNumber,
+      errors
+    );
+    const relatedParty = validateOptionalBoolean(optionalRow.related_party, "related_party", rowNumber, errors);
+    const legacyBalanceNzd = validateOptionalNumber(
+      optionalRow.legacy_balance_nzd,
+      "legacy_balance_nzd",
+      rowNumber,
+      errors
+    );
+    const willExtendNewCredit = validateOptionalBoolean(
+      optionalRow.will_extend_new_credit,
+      "will_extend_new_credit",
+      rowNumber,
+      errors
+    );
+    const newCreditLimitNzd = validateOptionalNumber(
+      optionalRow.new_credit_limit_nzd,
+      "new_credit_limit_nzd",
+      rowNumber,
+      errors
+    );
+    const restrictedPeriodIndicator = validateOptionalEnum(
+      optionalRow.restricted_period_indicator,
+      "restricted_period_indicator",
+      restrictedPeriodValues,
+      rowNumber,
+      errors
+    );
+    const commerciallyWorthRemediating = validateOptionalBoolean(
+      optionalRow.commercially_worth_remediating,
+      "commercially_worth_remediating",
+      rowNumber,
+      errors
+    );
+    const annualContractValueNzd = validateOptionalNumber(
+      optionalRow.annual_contract_value_nzd,
+      "annual_contract_value_nzd",
+      rowNumber,
+      errors
+    );
+    const hasPersonalGuarantee = validateOptionalBoolean(
+      optionalRow.has_personal_guarantee,
+      "has_personal_guarantee",
+      rowNumber,
+      errors
+    );
+    const ppsrCorrectionType = validateOptionalEnum(
+      optionalRow.ppsr_correction_type,
+      "ppsr_correction_type",
+      ppsrCorrectionTypeValues,
+      rowNumber,
+      errors
+    );
+    const securityAgreementStatus = validateOptionalEnum(
+      optionalRow.security_agreement_status,
+      "security_agreement_status",
+      securityAgreementStatusValues,
+      rowNumber,
+      errors
+    );
+
+    if (
+      debtorType === undefined ||
+      legalNameVerified === undefined ||
+      insolvencyRisk === undefined ||
+      relatedParty === undefined ||
+      legacyBalanceNzd === undefined ||
+      willExtendNewCredit === undefined ||
+      newCreditLimitNzd === undefined ||
+      restrictedPeriodIndicator === undefined ||
+      commerciallyWorthRemediating === undefined ||
+      annualContractValueNzd === undefined ||
+      hasPersonalGuarantee === undefined ||
+      ppsrCorrectionType === undefined ||
+      securityAgreementStatus === undefined
+    ) {
+      continue;
+    }
+
     records.push({
       customerId: row.customer_id,
       tradingName: row.trading_name,
@@ -164,7 +308,24 @@ export function parseReadinessCsv(input: string): CsvImportResult {
       ppsrDebtorMatches,
       emailConfidence,
       collateralClauseApproved,
-      customerResponse
+      customerResponse,
+      ...(optionalRow.debtor_type ? { debtorType } : {}),
+      ...(optionalRow.incorporation_number ? { incorporationNumber: optionalRow.incorporation_number } : {}),
+      ...(optionalRow.legal_name_verified ? { legalNameVerified } : {}),
+      ...(optionalRow.insolvency_risk ? { insolvencyRisk } : {}),
+      ...(optionalRow.related_party ? { relatedParty } : {}),
+      ...(optionalRow.legacy_balance_nzd ? { legacyBalanceNzd } : {}),
+      ...(optionalRow.will_extend_new_credit ? { willExtendNewCredit } : {}),
+      ...(optionalRow.new_credit_limit_nzd ? { newCreditLimitNzd } : {}),
+      ...(optionalRow.restricted_period_indicator ? { restrictedPeriodIndicator } : {}),
+      ...(optionalRow.commercially_worth_remediating ? { commerciallyWorthRemediating } : {}),
+      ...(optionalRow.residual_risk_approved_by ? { residualRiskApprovedBy: optionalRow.residual_risk_approved_by } : {}),
+      ...(optionalRow.annual_contract_value_nzd ? { annualContractValueNzd } : {}),
+      ...(optionalRow.has_personal_guarantee ? { hasPersonalGuarantee } : {}),
+      ...(optionalRow.guarantor_name ? { guarantorName: optionalRow.guarantor_name } : {}),
+      ...(optionalRow.guarantor_email ? { guarantorEmail: optionalRow.guarantor_email } : {}),
+      ...(optionalRow.ppsr_correction_type ? { ppsrCorrectionType } : {}),
+      ...(optionalRow.security_agreement_status ? { securityAgreementStatus } : {})
     });
   }
 
@@ -215,6 +376,61 @@ function validateBoolean(value: string, rowNumber: number, errors: CsvValidation
     row: rowNumber,
     column: "e_sign_eligible",
     message: `Invalid e_sign_eligible "${value}"; expected true or false`
+  });
+  return undefined;
+}
+
+function validateOptionalEnum<T extends string>(
+  value: string,
+  column: OptionalReadinessCsvColumn,
+  allowedValues: readonly T[],
+  rowNumber: number,
+  errors: CsvValidationError[]
+): T | undefined | null {
+  if (!value) return null;
+  if ((allowedValues as readonly string[]).includes(value)) return value as T;
+
+  errors.push({
+    row: rowNumber,
+    column: column as ReadinessCsvColumn,
+    message: `Invalid ${column} "${value}"; expected one of: ${allowedValues.join(", ")}`
+  });
+  return undefined;
+}
+
+function validateOptionalBoolean(
+  value: string,
+  column: OptionalReadinessCsvColumn,
+  rowNumber: number,
+  errors: CsvValidationError[]
+): boolean | undefined | null {
+  if (!value) return null;
+  const normalized = value.toLowerCase();
+  if (normalized === "true") return true;
+  if (normalized === "false") return false;
+
+  errors.push({
+    row: rowNumber,
+    column: column as ReadinessCsvColumn,
+    message: `Invalid ${column} "${value}"; expected true or false`
+  });
+  return undefined;
+}
+
+function validateOptionalNumber(
+  value: string,
+  column: OptionalReadinessCsvColumn,
+  rowNumber: number,
+  errors: CsvValidationError[]
+): number | undefined | null {
+  if (!value) return null;
+  const parsed = Number(value);
+  if (Number.isFinite(parsed)) return parsed;
+
+  errors.push({
+    row: rowNumber,
+    column: column as ReadinessCsvColumn,
+    message: `Invalid ${column} "${value}"; expected a number`
   });
   return undefined;
 }
